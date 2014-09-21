@@ -9,9 +9,15 @@ Analysis of age-related genomic regions
 - `mmc4_Genes_S6.*` - 334 genes correlated with age by expression 
 - `mmc5_Genes_all/neg/pos_S7.*` 54 genes correlated with age by expression and by the presence of age-related DRMs. Split in negatively/positively correlated
 
+Use 450K for background
+
 **Rakyan V. et. al. paper ["Human aging-associated DNA hypermethylation occurs preferentially at bivalent chromatin domains"](http://genome.cshlp.org/content/early/2010/03/09/gr.103101.109)**
 
-- `Supp_Table_3.*` - age-related hypermethylated regions in CD4+ and CD14+ cells
+- `Supp_Table_3.*` - age-related hypermethylated regions in CD4+ and CD14+ cells. Use 27K for background
+
+##Alisch R. et. al. paper ["Age-associated DNA methylation in pediatric populations"](http://genome.cshlp.org/content/22/4/623.full)**
+
+- `Alisch_et_al_Sup_Table2.*` - a total of 2078 age-associated DMRs, 1601 demethylated, 477 methylated ("SSC.age.cor" column). Use 450K for background
 
 Miscellaneous
 --------------

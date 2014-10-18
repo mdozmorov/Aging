@@ -44,7 +44,7 @@ mtx.adjust.raw <- function(x, method="fdr") {
 }
 
 # Filters non-significant rows from a matrix
-mtx.filter <- function(x, pval=0.01){
+mtx.filter <- function(x, pval=0.05){
   idx <- apply(x, 1, function(i) {sum(abs(i) < pval) >= 1})
   tmp <- as.matrix(x[idx, , drop=F])
   colnames(tmp) <- colnames(x)
@@ -64,7 +64,7 @@ mtx.filter <- function(x, pval=0.01){
 
 # Shows top 10 enriched and depleted associations as tables
 showTable <- function(mtx) {
-  mtx <- mtx.adjust.raw(mtx.untransform(mtx), "fdr") # Adjust for multiple testing
+  mtx <- mtx.adjust.raw(mtx.untransform(mtx), "none") # Adjust for multiple testing
   mtx <- mtx.filter(mtx, 0.01) # Get two sepatate lists, enchched and depleted
   numEnrich <- nrow(mtx[[1]]) # Total number of significantly enriched
   numDeplet <- nrow(mtx[[2]]) # and depleted associations
@@ -72,18 +72,20 @@ showTable <- function(mtx) {
     print(paste("The total number of significantly ENRICHED associations is:", numEnrich))
     if (numEnrich > 10) numEnrich <- 10
     mtx.enrich <- merge(data.frame(pval=format(as.matrix(mtx[[1]][1:numEnrich, , drop=F]), digits=3, scientific=T),
-                                   row.names=rownames(as.matrix(mtx[[1]]))[1:numEnrich]), trackDb.hg19, by="row.names", all.x=T)
-    print(mtx.enrich)
+                                   row.names=rownames(as.matrix(mtx[[1]]))[1:numEnrich]), trackDb.hg19, by="row.names", all.x=T, sort=FALSE)
+    pander(mtx.enrich, split.table=Inf)
     barplot1(mtx.transform(mtx[[1]][1:numEnrich, , drop=F]), 15)
     #    grid.table(mtx.enrich, gp=gpar(fontsize=6))
+    print("---------------------------------------------------------------")
   }
   if (numDeplet > 0) {
     print(paste("The total number of significantly DEPLETED associations is:", numDeplet))
     if (numDeplet > 10) numDeplet <- 10
     mtx.deplet <- merge(data.frame(pval=format(as.matrix(mtx[[2]][1:numDeplet, , drop=F]), digits=3, scientific=T), row.names=rownames(as.matrix(mtx[[2]]))[1:numDeplet]), trackDb.hg19, by="row.names", all.x=T)
-    print(mtx.deplet)
+    pander(mtx.deplet, split.table=Inf)
     barplot1(mtx.transform(mtx[[2]][1:numDeplet, , drop=F]), 15)
     #grid.table(mtx)
+    print("---------------------------------------------------------------")
   }
 }
 
@@ -93,7 +95,7 @@ showTable <- function(mtx) {
 barplot1<-function(mtx, bottom, ...){
   par(mar=c(bottom,5,2,2)+0.1)
   groupcolors<-rainbow(ncol(mtx)) #c("yellow2","steelblue3","steelblue3","springgreen)
-  b<-barplot(as.matrix(t(mtx)), beside=T,  ylab="-log10(p-value)\nnegative = underrepresentation", col=groupcolors,space=c(0.2,1), cex.names=1, las=2) #, names.arg=rownames(mtx)) # ,legend.text=colnames(mtx),args.legend=list(x=7,y=4))
+  b<-barplot(as.matrix(t(mtx)), beside=T,  ylab="-log10(p-value)\nnegative = underrepresentation", col=groupcolors,space=c(0.2,1), cex.names=0.7, las=2) #, names.arg=rownames(mtx)) # ,legend.text=colnames(mtx),args.legend=list(x=7,y=4))
   lines(c(0,100),c(-log10(0.01),-log10(0.01)),type="l",lty="dashed",lwd=2)
   lines(c(0,100),c(log10(0.01),log10(0.01)),type="l",lty="dashed",lwd=2)
   

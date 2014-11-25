@@ -19,6 +19,14 @@ Use 450K for background
 
 - `Supp_Table_3.*` - 130 age-related hypermethylated regions in CD4+ and CD14+ cells. Use 27K for background
 
+##Reynolds, L. M. et. al. paper ["Age-related variations in the methylome associated with gene expression in human monocytes and T cells."](http://www.nature.com/ncomms/2014/141118/ncomms6366/full/ncomms6366.html#supplementary-information)
+
+- [Supplementary Data 1](http://www.nature.com/ncomms/2014/141118/ncomms6366/extref/ncomms6366-s2.xlsx) - CpG sites with age-associated methylation (age-dMS) detected in 227 T-cell samples (FDR<0.001)
+
+- [Supplementary Data 2](http://www.nature.com/ncomms/2014/141118/ncomms6366/extref/ncomms6366-s3.xlsx) - Age and cis-gene expression associated methylation sites (age-eMS) detected in 1,264 monocyte samples (FDR<0.001)
+
+Coordinates are in hg19. Manually extract them from .xls files converting chr17:27369892 into chr17   27369892   27369893.
+
 Miscellaneous
 --------------
 `R.Aging` - Scripts to create .BED files for Illumina Infinium 27K and 450K arrays. Also, extract genomic coordinates of subsets of probes. Note that point coordinates are outputted. Ideally, one need to convert them to 50bp probes depending on strand. Currently, simply add +/-50bp flanking regions around each site.

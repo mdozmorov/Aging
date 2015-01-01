@@ -1,0 +1,138 @@
+---
+title: "Hannum general markers analysis"
+author: "Mikhail Dozmorov"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, echo=FALSE, include=FALSE, cache=FALSE}
+# Set up the environment
+library(knitr) 
+opts_chunk$set(cache.path='cache/', fig.path='img/', cache=F, tidy=T, fig.keep='high', dpi=300,  echo=F, autodep=T, width=200, warning=FALSE, comment=NA, results='hide')
+options(replace.assign=TRUE, width=500)
+tidy.opts=list(width.cutoff=200)
+suppressMessages(library(pander))
+panderOptions('table.split.table', Inf)
+set.seed(1)
+```
+
+```{r warning=FALSE, message=F}
+source("../../R.GenomeRunner/utils.R")
+```
+
+Hannum tissue markers
+===
+    *  50 Hannum_aging_markers_breast.bed
+    *  62 Hannum_aging_markers_kidney.bed
+    *  14 Hannum_aging_markers_lung.bed
+      
+Chromatin states
+---
+Non-cell type-specific enrichment in 'Poised promoter' state, and depletion in 'Heterochromatin' state. Kidney also enriched in 'Repressed'
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encBroadHmm/matrix.txt", colnum=c(1, 2, 3), factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Breast
+----
+Poised and weak promoter. Depleted in heterochromatin
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encBroadHmm/matrix.txt", colnum=1, factor="none", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encBroadHmm/matrix.txt", colnum=1, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Kidney
+----
+Poised promoter, and, surprisingly, repressed. Depleted in heterochromatin
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encBroadHmm/matrix.txt", colnum=2, factor="none", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encBroadHmm/matrix.txt", colnum=2, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Lung
+----
+Similar to Kidney
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encBroadHmm/matrix.txt", colnum=3, factor="none", cell="none", isLog10=TRUE, adjust="none", pval=0.1, numtofilt=2, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encBroadHmm/matrix.txt", colnum=3, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Histone marks
+---
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encHistone/matrix.txt", colnum=c(1, 2, 3), factor="Histone", cell="none", isLog10=TRUE, adjust="none", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Breast
+---
+Breast in H3K4me3, possibly H3K4me2 and CTCF. Depleted in H3K36me3, H4K20me1.
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Kidney
+---
+REST, H3K4me2, H3K27me3, EZH2. Depleted in H3K79me2.
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encHistone/matrix.txt", colnum=2, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encHistone/matrix.txt", colnum=2, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Lung
+---
+Similar to Kidney, just underpowered
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encHistone/matrix.txt", colnum=3, factor="Histone", cell="none", isLog10=TRUE, adjust="none", pval=0.1, numtofilt=2, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encHistone/matrix.txt", colnum=3, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+TFBSs
+---
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encTfbs/matrix.txt", colnum=c(1, 2, 3), factor="Tfbs", cell="none", isLog10=TRUE, adjust="none", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Breast
+---
+Znf143, CTCF, potentially, Max
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encTfbs/matrix.txt", colnum=1, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.01, numtofilt=5, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encTfbs/matrix.txt", colnum=1, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Kidney
+---
+Max, Nrsf
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encTfbs/matrix.txt", colnum=2, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encTfbs/matrix.txt", colnum=2, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+ Lung
+---
+Similar to Kidney, just underpowered
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encTfbs/matrix.txt", colnum=3, factor="Tfbs", cell="none", isLog10=TRUE, adjust="none", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/tissue_vs_encTfbs/matrix.txt", colnum=3, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+

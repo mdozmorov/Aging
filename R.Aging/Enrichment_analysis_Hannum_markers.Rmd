@@ -24,7 +24,7 @@ Hannum markers: The 71 age-associated methylation regions included in the primar
 ===
 Chromatin states
 ---
-Non-cell type-specific enrichment in 'Poised promoter' state, and depletion in 'Heterochromatin' state.
+Non-cell type-specific enrichment in 'Poised promoter' state, and depletion in 'Heterochromatin' state. Unadjusted p-values
 ```{r fig.height=5, eval=T}
 showHeatmap("../GenomeRunner/Hannum/markers_vs_encBroadHmm/matrix.txt", colnum=2, factor="none", cell="none", isLog10=TRUE, adjust="none", pval=0.1, numtofilt=2, toPlot="heat")
 ```

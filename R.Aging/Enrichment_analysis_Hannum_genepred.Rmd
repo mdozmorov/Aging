@@ -1,0 +1,59 @@
+---
+title: "Hannum predictive genes analysis"
+author: "Mikhail Dozmorov"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, echo=FALSE, include=FALSE, cache=FALSE}
+# Set up the environment
+library(knitr) 
+opts_chunk$set(cache.path='cache/', fig.path='img/', cache=F, tidy=T, fig.keep='high', dpi=300,  echo=F, autodep=T, width=200, warning=FALSE, comment=NA, results='hide')
+options(replace.assign=TRUE, width=500)
+tidy.opts=list(width.cutoff=200)
+suppressMessages(library(pander))
+panderOptions('table.split.table', Inf)
+set.seed(1)
+```
+
+```{r warning=FALSE, message=F}
+source("../../R.GenomeRunner/utils.R")
+```
+
+Hannum genepred markers
+===
+    *  63 Hannum_genes_predictive.bed
+    *  36 Hannum_genes_predictive_neg.bed
+    *  27 Hannum_genes_predictive_pos.bed
+      
+Chromatin states
+---
+Poised promoter, and repressed.
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Hannum/genepred_vs_encBroadHmm/matrix.txt", colnum=1, factor="none", cell="none", isLog10=TRUE, adjust="none", pval=0.1, numtofilt=2, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/genepred_vs_encBroadHmm/matrix.txt", colnum=1, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Histone marks
+---
+
+H3K27me3, EZH2. Depleted in H3K36me3, H3K79me2, H3K27ac.
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Hannum/genepred_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/genepred_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+TFBSs
+---
+
+Uncorrected p-values. CTCF
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Hannum/genepred_vs_encTfbs/matrix.txt", colnum=1, factor="Tfbs", cell="none", isLog10=TRUE, adjust="none", pval=0.01, numtofilt=4, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Hannum/genepred_vs_encTfbs/matrix.txt", colnum=1, factor="Tfbs", cell="none", isLog10=TRUE, adjust="none", pval=0.1, numtofilt=2, toPlot="bar")
+```

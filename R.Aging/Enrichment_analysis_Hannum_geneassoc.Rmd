@@ -18,6 +18,8 @@ set.seed(1)
 
 ```{r warning=FALSE, message=F}
 source("../../R.GenomeRunner/utils.R")
+cells=c("H1hesc", "Hsmm", "H1neurons", "H7es", "H9es")
+#cells="none"
 ```
 
 Hannum geneassoc markers
@@ -28,10 +30,10 @@ Chromatin states
 ---
 Poised promoter, and repressed. Depleted in heterochromatin and elongation
 ```{r fig.height=5, eval=T}
-showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encBroadHmm/matrix.txt", colnum=1, factor="none", cell="none", isLog10=TRUE, adjust="none", pval=0.1, numtofilt=2, toPlot="heat")
+showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encBroadHmm/matrix.txt", colnum=1, factor="none", cell=cells, isLog10=TRUE, adjust="none", pval=0.1, numtofilt=2, toPlot="heat")
 ```
 ```{r fig.height=3, eval=T}
-showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encBroadHmm/matrix.txt", colnum=1, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encBroadHmm/matrix.txt", colnum=1, factor="name", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
 ```
 
 Histone marks
@@ -39,10 +41,10 @@ Histone marks
 
 H3K27me3, EZH2. Depleted in H3K36me3, H3K9me3.
 ```{r fig.height=5, eval=T}
-showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
+showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
 ```
 ```{r fig.height=3, eval=T}
-showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
 ```
 
 TFBSs
@@ -50,8 +52,8 @@ TFBSs
 
 Uncorrected p-values. CTCF
 ```{r fig.height=5, eval=T}
-showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encTfbs/matrix.txt", colnum=1, factor="Tfbs", cell="none", isLog10=TRUE, adjust="none", pval=0.01, numtofilt=3, toPlot="heat")
+showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encTfbs/matrix.txt", colnum=1, factor="Tfbs", cell=cells, isLog10=TRUE, adjust="none", pval=0.01, numtofilt=3, toPlot="heat")
 ```
 ```{r fig.height=3, eval=T}
-showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encTfbs/matrix.txt", colnum=1, factor="Tfbs", cell="none", isLog10=TRUE, adjust="none", pval=0.1, numtofilt=2, toPlot="bar")
+showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encTfbs/matrix.txt", colnum=1, factor="Tfbs", cell=cells, isLog10=TRUE, adjust="none", pval=0.1, numtofilt=2, toPlot="bar")
 ```

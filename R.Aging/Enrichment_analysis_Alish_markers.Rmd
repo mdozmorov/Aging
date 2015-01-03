@@ -1,0 +1,159 @@
+---
+title: "Alish markers analysis"
+author: "Mikhail Dozmorov"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, echo=FALSE, include=FALSE, cache=FALSE}
+# Set up the environment
+library(knitr) 
+opts_chunk$set(cache.path='cache/', fig.path='img/', cache=F, tidy=T, fig.keep='high', dpi=300,  echo=T, autodep=T, width=200, warning=FALSE, comment=NA, results='hide')
+options(replace.assign=TRUE, width=500)
+tidy.opts=list(width.cutoff=200)
+suppressMessages(library(pander))
+panderOptions('table.split.table', Inf)
+set.seed(1)
+```
+
+```{r warning=FALSE, message=F}
+source("../../R.GenomeRunner/utils.R")
+cells=c("H1hesc", "Hsmm", "H1neurons", "H7es", "H9es")
+```
+
+Alish markers: a total of 2078 age-associated DMRs, 1601 demethylated (neg), 477 methylated (pos)
+===
+Chromatin states
+---
+
+Methylated
+---
+General in 'repressed, but 'poised promoter' in H1hesc.
+
+General, Gm12878 depletion in 'heterochromatin', other in 'active promoter'. Specific depletion in 'Txn elongation', 'active promoter', 'heterochromatin'.
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encBroadHmm/matrix.txt", colnum=2, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encBroadHmm/matrix.txt", colnum=2, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encBroadHmm/matrix.txt", colnum=2, factor="name", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Demethylated
+---
+General and specific 'strong enhancer', but 'heterochromatin' in H1hesc. 'Weak promoteri'
+
+General and specific depletion in 'Txn elongation' and 'Active promoter'
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encBroadHmm/matrix.txt", colnum=3, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encBroadHmm/matrix.txt", colnum=3, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encBroadHmm/matrix.txt", colnum=3, factor="name", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Both
+---
+General and specific differential enrichment in heterochromatin, methylated down, demethylated up. Same with 'poised promoter', methylated up, demethylated down. Demethylated are nearly exclusively enriched in strong enhancers.
+
+Similar depletion in 'Txn elongation', 'active promoter'. Similar enrichment in 'weak promoter'
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encBroadHmm/matrix.txt", colnum=c(2, 3), factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encBroadHmm/matrix.txt", colnum=c(2, 3), factor="name", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Histone marks
+---
+
+Methylated
+---
+General in H3K27me3 and EZH2, Depletion in H3K36me3, H3K79me2.
+
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone/matrix.txt", colnum=2, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone/matrix.txt", colnum=2, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone/matrix.txt", colnum=2, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Demethylated
+---
+General enrichment in H3K4me1, H2az.
+
+General depletion in H3K9me3, H3K36me3
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone/matrix.txt", colnum=3, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone/matrix.txt", colnum=3, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone/matrix.txt", colnum=3, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Both
+---
+Differential enrichment in H3K9me3, methylated up, demethylated dn.
+
+Methylated predominantly H3K27me3, Demethylated in H3K4me1.
+
+Similar enrichment in H2az, depletion ih H3K36me3
+
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone/matrix.txt", colnum=c(2, 3), factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone/matrix.txt", colnum=c(2, 3), factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Transcription Factor binding sites
+---
+
+Methylated
+---
+Global enrichment in EZH2, SUZ12, E2F6. Some enrichment in NRSF
+
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encTfbs/matrix.txt", colnum=2, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=8, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encTfbs/matrix.txt", colnum=2, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encTfbs/matrix.txt", colnum=2, factor="Tfbs", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Demethylated
+---
+Enrichment in JunD, CEBPB
+
+Global and specific depletion in Pol2, TAF1
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encTfbs/matrix.txt", colnum=3, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=8, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encTfbs/matrix.txt", colnum=3, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encTfbs/matrix.txt", colnum=3, factor="Tfbs", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Both
+---
+Depletion is similar, but EZH2 is differentially enriched, methylated up, demethylated dn. Same for SUZ12 and E2F6. CEBPB is reverse, methylated dn, demethylated up.
+
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encTfbs/matrix.txt", colnum=c(2, 3), factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encTfbs/matrix.txt", colnum=c(2, 3), factor="Tfbs", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```

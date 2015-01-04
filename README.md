@@ -49,7 +49,7 @@ Reynolds, L. M. et. al. paper ["Age-related variations in the methylome associat
 
 - [Supplementary Data 2](http://www.nature.com/ncomms/2014/141118/ncomms6366/extref/ncomms6366-s3.xlsx) - Age and cis-gene expression associated methylation sites (age-eMS) detected in 1,264 monocyte samples (FDR<0.001)
 
-Coordinates are in hg19. Manually extract them from .xls files converting chr17:27369892 into chr17   27369892   27369893.
+Coordinates are in hg19. 
 
 Miscellaneous
 --------------

@@ -1,0 +1,119 @@
+---
+title: "Reynolds markers analysis"
+author: "Mikhail Dozmorov"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, echo=FALSE, include=FALSE, cache=FALSE}
+# Set up the environment
+library(knitr) 
+opts_chunk$set(cache.path='cache/', fig.path='img/', cache=F, tidy=T, fig.keep='high', dpi=300,  echo=T, autodep=T, width=200, warning=FALSE, comment=NA, results='hide')
+options(replace.assign=TRUE, width=500)
+tidy.opts=list(width.cutoff=200)
+suppressMessages(library(pander))
+panderOptions('table.split.table', Inf)
+set.seed(1)
+```
+
+```{r warning=FALSE, message=F}
+source("../../R.GenomeRunner/utils.R")
+cells=c("H1hesc", "Hsmm", "H1neurons", "H7es", "H9es")
+```
+
+Reynolds markers
+
+* CpG sites with age-associated methylation (age-dMS) detected in 227 T-cell samples (FDR<0.001)
+
+* Age and cis-gene expression associated methylation sites (age-eMS) detected in 1,264 monocyte samples (FDR<0.001)
+
+  *  2259 Reynolds_aging_markers_monocytes.bed
+  *  1791 Reynolds_aging_markers_monocytes_neg.bed
+  *   468 Reynolds_aging_markers_monocytes_pos.bed
+  *  2595 Reynolds_aging_markers_tcells.bed
+  *   546 Reynolds_aging_markers_tcells_neg.bed
+  *  2049 Reynolds_aging_markers_tcells_pos.bed
+    
+===
+Chromatin states
+---
+T-cells
+---
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encBroadHmm/matrix.txt", colnum=2, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encBroadHmm/matrix.txt", colnum=2, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encBroadHmm/matrix.txt", colnum=2, factor="name", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+T-cells
+---
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encBroadHmm/matrix.txt", colnum=2, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encBroadHmm/matrix.txt", colnum=2, factor="name", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encBroadHmm/matrix.txt", colnum=2, factor="name", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+
+
+Histone marks
+---
+Enrichment in EZH2, H3K27me3, JMJD2A. Depletion in H3K79me2, H3K27ac, H3K36me3
+
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Transcription Factor binding sites
+---
+Enrichment in EZH2, SUZ12, CtBP2. Some NRSF
+
+Depletion in Pol2
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encTfbs/matrix.txt", colnum=1, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.2, numtofilt=8, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encTfbs/matrix.txt", colnum=1, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encTfbs/matrix.txt", colnum=1, factor="Tfbs", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Demethylated
+---
+Enrichment in JunD, CEBPB
+
+Global and specific depletion in Pol2, TAF1
+```{r fig.height=5, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encTfbs/matrix.txt", colnum=3, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=8, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encTfbs/matrix.txt", colnum=3, factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encTfbs/matrix.txt", colnum=3, factor="Tfbs", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Both
+---
+Depletion is similar, but EZH2 is differentially enriched, methylated up, demethylated dn. Same for SUZ12 and E2F6. CEBPB is reverse, methylated dn, demethylated up.
+
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encTfbs/matrix.txt", colnum=c(2, 3), factor="Tfbs", cell="none", isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+```{r fig.height=3, eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encTfbs/matrix.txt", colnum=c(2, 3), factor="Tfbs", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```

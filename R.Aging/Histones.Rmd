@@ -1,0 +1,313 @@
+---
+title: "Study specific epigenomic enrichment analysis of histone modification marks"
+author: "Mikhail Dozmorov"
+output: html_document
+---
+```{r setup, echo=FALSE, include=FALSE, cache=FALSE}
+# Set up the environment
+library(knitr) 
+opts_chunk$set(cache.path='cache/', fig.path='img/', cache=F, tidy=T, fig.keep='high', dpi=100,  echo=F, autodep=T, width=200, warning=FALSE, comment=NA, results='hide')
+options(replace.assign=TRUE, width=500)
+tidy.opts=list(width.cutoff=200)
+suppressMessages(library(pander))
+panderOptions('table.split.table', Inf)
+set.seed(1)
+```
+
+```{r warning=FALSE, message=F}
+source("../../R.GenomeRunner/utils1.R")
+cells=c("H1hesc") #, "H7es", "H9es")
+tier1 <- c("Gm12878","Hmec","H1hesc","Nhek","Nhlf","Huvec","Hepg2","K562","Hsmm")
+h <- list()
+```
+
+The results of study-specific enrichment analysis are visualized as the following plots:
+
+1) Heatmap of Cell ~ Factor enrichment results, each cell shows the epigenomic enrichment p-values;
+2) Barplot of ehriched associations, displayed from most to least significant;
+3) Barplot of depleted associations, displayed from most to least significant.
+
+If the number of enriched/depleted associations is insufficient to create a plot, it is not displayes. Darker blue/red gradient highlights depleted/enriched associations.
+
+Hannum_aDMRs_primary
+===
+
+The 71 age-associated methylation regions included in the primary aging model
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Hannum/markers_vs_encHistone//matrix.txt", colnum=c(2), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3 , eval=T}
+h1 <- showHeatmap("../GenomeRunner/Hannum/markers_vs_encHistone//matrix.txt", colnum=c(2), factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Hannum_aDMRs_all
+===
+
+The 89 age-associated methylation regions identified using all data.
+
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Hannum/markers_vs_encHistone//matrix.txt", colnum=c(1), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Hannum/markers_vs_encHistone//matrix.txt", colnum=1, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Alisch_aDMRs_all
+===
+
+2,078 regions correlated with age by methylation in peripheral blood
+
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone//matrix.txt", colnum=c(1), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone/matrix.txt", colnum=c(1), factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Rakyan_aDMR_all
+===
+
+131 regions correlated with age by methylation in whole blood, and show the same directional age-associated DNA methylation change in CD4+ T-cells and CD14+ monocytes.
+
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Rakyan/markers_vs_encHistone//matrix.txt", colnum=c(1), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Rakyan/markers_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Reynolds_aDMRs_tcells
+===
+
+2,595 regions correlated with age by methylation in CD4+ T-cells
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encHistone//matrix.txt", colnum=c(2), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Reynolds/markers_vs_encHistone/matrix.txt", colnum=2, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Reynolds_aDMRs_monocytes
+===
+
+2,259 regions correlated with age by methylation on CD14+ monocytes. 
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markers_vs_encHistone//matrix.txt", colnum=c(1), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Reynolds/markers_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Steegenga_aDMR_and_gene
+===
+
+726 methylation markers correlated with age- and gene expression changes in peripheral blood
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Steegenga//markersandnot_vs_encHistone/matrix.txt", colnum=c(1), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Steegenga//markersandnot_vs_encHistone/matrix.txt", colnum=c(1), factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Steegenga_aDMR_not_gene
+===
+
+4,552 methylation markers correlated with age- but not with gene expression changes in peripheral blood
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Steegenga//markersandnot_vs_encHistone/matrix.txt", colnum=c(2), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Steegenga//markersandnot_vs_encHistone/matrix.txt", colnum=c(2), factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Steegenga_aDMR_meta
+===
+
+7,477 age-associated methylation markers identified in multiple studies
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Steegenga//markersmeta_vs_encHistone/matrix.txt", colnum=c(1), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Steegenga//markersmeta_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Heyn_aDMRs
+===
+
+3,205 age-associated methylation markers differentially methylated in cord blood of newborns and CD4+ T cells of centenarians
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Heyn//markers_vs_encHistone/matrix.txt", colnum=c(1), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Heyn//markers_vs_encHistone/matrix.txt", colnum=c(1), factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Hannum_genes_associated
+===
+
+326 genes correlated with age by expression, whole blood, data not related to methylation data
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encHistone/matrix.txt", colnum=c(1), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Hannum/geneassoc_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Hannum_genes_predictive
+===
+
+55 genes predictive of age based by their expression, whole blood, data not related to methylation data.
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Hannum/genepred_vs_encHistone/matrix.txt", colnum=c(1), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Hannum/genepred_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Genes_LongevityMap
+===
+
+752 manually curated list of age-associated genes
+---
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/genes/genes_vs_encHistone/matrix.txt", colnum=c(3), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/genes/genes_vs_encHistone/matrix.txt", colnum=3, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+deMagalhaes
+===
+
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/deMagalhaes/genes_vs_encHistone/matrix.txt", colnum=3, factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/deMagalhaes/genes_vs_encHistone/matrix.txt", colnum=3, factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+Alisch_aDMRs_pos/neg
+===
+
+2,078 regions correlated with age by methylation in peripheral blood; 479 of them showed positive correlation with age by methylation, 1,599 were found to be negatively correlated with age
+
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone/matrix.txt", colnum=c(2), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
+```
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone/matrix.txt", colnum=c(3), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Alisch/markers_vs_encHistone/matrix.txt", colnum=c(2, 3), factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Reynolds_aDMRs_monocytes_pos/neg
+===
+
+2,259 regions correlated with age by methylation on CD14+ monocytes. 468 of them showed positive correlation with age by methylation, 1,791 were found to be negatively correlated with age. 
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markersposneg_vs_encHistone/matrix.txt", colnum=c(2), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markersposneg_vs_encHistone/matrix.txt", colnum=c(1), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Reynolds/markersposneg_vs_encHistone/matrix.txt", colnum=c(2, 1), factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Reynolds_aDMRs_tcells_pos/neg
+===
+
+2,595 regions correlated with age by methylation in CD4+ T-cells. 2,049 of them showed positive correlation with age by methylation, 546 were found to be negatively correlated with age
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markersposneg_vs_encHistone/matrix.txt", colnum=c(4), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Reynolds/markersposneg_vs_encHistone/matrix.txt", colnum=c(3), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Reynolds/markersposneg_vs_encHistone/matrix.txt", colnum=c(4, 3), factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Hannum_genes_predictive_pos/neg
+===
+
+55 genes predictive of age based by their expression, whole blood, data not related to methylation data. 24 of these genes showed positive correlation with age by expression, 31 were found to be negatively correlated with age
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Hannum/genepred_vs_encHistone/matrix.txt", colnum=c(3), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=4, toPlot="heat")
+```
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Hannum/genepred_vs_encHistone/matrix.txt", colnum=c(2), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Hannum/genepred_vs_encHistone/matrix.txt", colnum=c(3, 2), factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+Heyn_aDMRs_pos/neg
+===
+
+3,205 age-associated methylation markers differentially methylated in cord blood of newborns and CD4+ T cells of centenarians; 1,219 of them showed hypermethylation with age, 1,986 were found to be hypomethylated with age
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Heyn//markers_vs_encHistone/matrix.txt", colnum=c(3), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/Heyn//markers_vs_encHistone/matrix.txt", colnum=c(2), factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/Heyn//markers_vs_encHistone/matrix.txt", colnum=c(3, 2), factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+```
+
+deMagalhaes_pos/neg
+===
+
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/deMagalhaes/genes_vs_encHistone/matrix.txt", colnum=1, factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=5 , eval=T}
+showHeatmap("../GenomeRunner/deMagalhaes/genes_vs_encHistone/matrix.txt", colnum=2, factor="Histone", cell=tier1, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=3, toPlot="heat")
+```
+```{r fig.height=3, eval=T}
+h1 <- showHeatmap("../GenomeRunner/deMagalhaes/genes_vs_encHistone/matrix.txt", colnum=c(1, 2), factor="Histone", cell=cells, isLog10=TRUE, adjust="fdr", pval=0.1, numtofilt=2, toPlot="bar")
+h <- c(h, list(h1))
+```
+
+
+Most significantly enriched marks
+===
+```{r results='asis'}
+h.up <- lapply(h, function(x) x[["up"]][, c("cell", "factor")])
+
+rbind_all(h.up) %>% 
+  count(cell, factor) %>% 
+  ungroup() %>%
+  arrange(desc(n)) %>%
+  kable()
+```
+
+Most significantly depleted marks
+===
+```{r results='asis'}
+h.dn <- lapply(h, function(x) x[["dn"]][, c("cell", "factor")])
+
+rbind_all(h.dn) %>% 
+  count(cell, factor) %>% 
+  ungroup() %>%
+  arrange(desc(n)) %>%
+  kable()
+```
+

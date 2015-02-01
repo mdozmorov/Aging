@@ -1,0 +1,486 @@
+---
+title: "All enrichments"
+author: "Mikhail Dozmorov"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+```{r setup, echo=FALSE, include=FALSE, cache=FALSE}
+# Set up the environment
+library(knitr) 
+opts_chunk$set(cache.path='cache/', fig.path='img/', cache=F, tidy=T, fig.keep='high', dpi=200,  echo=F, autodep=T, width=200, warning=FALSE, comment=NA)
+options(replace.assign=TRUE, width=500)
+tidy.opts=list(width.cutoff=200)
+suppressMessages(library(pander))
+panderOptions('table.split.table', Inf)
+set.seed(1)
+```
+
+```{r warning=FALSE, message=F}
+source("../../R.GenomeRunner/utils1.R")
+cells=c("H1hesc")#, "H7es", "H9es")
+# Selected GFs
+gfs_all <- c("Steegenga_aDMRs_not_gene", "Rakyan_aDMRs_all", "Steegenga_aDMRs_and_gene", "Reynolds_aDMRs_tcells", "Hannum_genes_associated", "genes_LongevityMap", "Hannum_genes_predictive", "Hannum_aDMRs_primary", "Hannum_aDMRs_all", "Alisch_aDMRs_all", "Steegenga_aDMRs_meta", "Reynolds_aDMRs_monocytes", "Heyn_aDMRs", "deMagalhaes_genes_all")
+gfs_posneg <- c("Alisch_aDMRs_pos", "Alisch_aDMRs_neg", "Reynolds_aDMRs_monocytes_pos", "Reynolds_aDMRs_tcells_neg", "Reynolds_aDMRs_tcells_pos", "Reynolds_aDMRs_monocytes_neg", "Hannum_genes_predictive_neg", "Hannum_genes_predictive_pos", "Heyn_aDMRs_neg", "Heyn_aDMRs_pos", "deMagalhaes_genes_pos", "deMagalhaes_genes_neg")
+
+mtx.subset <- function(fname, factor, cell){
+  mtx <- read.table(fname, sep="\t", header=T, row.names=1, stringsAsFactors=F) 
+  mtx <- as.matrix(mtx); class(mtx) <- "numeric"
+  mtx <- mtx[, colSums(!is.na(mtx)) == nrow(mtx)] # Get rid of NA columns 
+  mtx <- mtx[, factor] 
+  mtx <- mtx[grep(cell, rownames(mtx)), ]
+}
+
+# Selected marks
+marks_sel_h <- c("EZH2", "H3K27ME3", "H3K4ME2", "CHD1", "H3K4ME1", "RBBP5", "H2AZ", "HDAC2", "PHF8", "CHD7", "SUZ12", "H3K27AC", "H3K36ME3", "H3K79ME2") # selected histone marks
+
+correl <- "spearman"
+# Plotting options
+color <- colorRampPalette(c("blue", "white", "red")) # Define color gradient
+color <- matlab.like
+dist.method <- "euclidean"  
+hclust.method <- "average"
+granularity <- 10
+```
+
+Regulatory similarity among datasets using emryonic cell lines
+===
+
+All markers, excluding pos/neg
+---
+```{r}
+# Set up the file names to output the results
+fn_degs <- "results/degs_all_embryo.txt" # Differential GFs among the clusters
+fn_sum_h <- "results/summary_all_embryo_hist.txt" # Summarized enrichment results, histones
+fn_sum_t <- "results/summary_all_embryo_tfbs.txt" # Summarized enrichment results, TFBSs
+fn_sum_c <- "results/summary_all_embryo_chrom.txt" # Summarized enrichment results, chromstates
+```
+
+For each pair of aDMRs and aGENs, we calculated epigenomic similarity coefficient (Spearman correlation coefficient between corresponding epigenomic enrichment profiles). The matrix of epigenomic similarity coefficients is visualized as a heatmap, with blue/red gradient correspontind to low/high epigenomic similarity between the profiles.
+
+```{r fig.height=6}
+mtx1 <- mtx.subset("../GenomeRunner/ALL//all_encBroadHmm.txt", factor=gfs_all, cell=paste(cells, collapse="|"))
+mtx2 <- mtx.subset("../GenomeRunner/ALL//all_encHistone.txt", factor=gfs_all, cell=paste(cells, collapse="|"))
+mtx3 <- mtx.subset("../GenomeRunner/ALL//all_encTfbs.txt", factor=gfs_all, cell=paste(cells, collapse="|"))
+mtx <- rbind(mtx1, mtx2[, colnames(mtx1)], mtx3[, colnames(mtx1)])
+mtx.cor<-rcorr(as.matrix(mtx), type=correl)
+# Plotting
+par(oma=c(10,0,0,12), mar=c(10, 4.1, 4.1, 10), cex.main=0.65) # Adjust margins
+# Setting breaks to go from minimum to maximum correlation coefficients,
+# excluding min/max outliers. This way we get rid of diagonale of 1's
+my.breaks <- seq(min(mtx.cor[[1]][mtx.cor[[1]]!=min(mtx.cor[[1]])]),
+                 max(mtx.cor[[1]][mtx.cor[[1]]!=max(mtx.cor[[1]])]),
+                 length.out=(2*granularity + 1))
+marks_sets <- c("deMagalhaes_genes_all", "Heyn_aDMRs", "Reynolds_aDMRs_monocytes", "Alisch_aDMRs_all", "Steegenga_aDMRs_meta", "Hannum_aDMRs_primary", "Hannum_aDMRs_all", "Hannum_genes_predictive", "genes_LongevityMap", "Hannum_genes_associated", "Reynolds_aDMRs_tcells", "Rakyan_aDMRs_all", "Steegenga_aDMRs_and_gene", "Steegenga_aDMRs_not_gene")
+SideColors <- c("white", rep("red", 4), rep("green", 9))
+names(SideColors) <- marks_sets
+h <- heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="Regulatory similarity clustering", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks, ColSideColors=SideColors[colnames(as.matrix(mtx.cor[[1]]))])
+print("Distribution of correlation coefficients")
+diag(mtx.cor[[1]]) <- 0 # Eliminate self correlations
+(summary(mtx.cor[[1]][upper.tri(mtx.cor[[1]])]))
+print("Distribution of p-values")
+summary(mtx.cor[[3]][upper.tri(mtx.cor[[3]])])
+```
+```{r eval=FALSE}
+dist.methods <- c("euclidean", "maximum","manhattan", "minkowski")
+hclust.methods <- c("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid")
+for (d in dist.methods) {
+  for (h in hclust.methods) {
+    png(paste("results/clust", d, h,".png", sep="_"))
+    par(oma=c(10,0,0,10), mar=c(10, 4.1, 4.1, 10), cex.main=0.65) # Adjust margins
+    h<-heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=d)}, hclustfun=function(x){hclust(x, method=h)}, cexRow=1, cexCol=1,  main=paste(d, h),  breaks=my.breaks) # cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=1,
+    dev.off()
+  }
+}
+```
+
+Regulatory differences among the clusters (Differential enrichment analysis)
+---
+
+The heatmap object contains information about the order of the clustering. We visualized this information as a dendrogram, cut into separate clusters.
+
+```{r defineClusters1, echo=FALSE}
+par(oma=c(0, 0, 0, 0), mar=c(5.1, 4.1, 4.1,25.1), cex=0.5)
+# Plot the dendrogram only, limit y axis. attr(h$colDendrogram, "height") has the maximum height of the dendrogram.
+plot(h$colDendrogram, horiz=T) 
+# Cut the dentrogram into separate clusters. Tweak the height
+abline(v=1) # Visually evaluate the height where to cut
+c <- cut(h$colDendrogram, h=1) 
+# Check the number of clusters, and the number of members.
+for (i in 1:length(c$lower)) {
+  cat(paste("Cluster", formatC(i, width=2, flag="0"), sep=""), "has", formatC(attr(c$lower[[i]], "members"), width=3), "members", "\n")
+}
+```
+
+The epigenomic enrichment p-values are -log10-transformed. The distributions of these transformed p-values can be tested for the statistically significant differences among the clusters using the Bioconductor *limma* package.
+
+First, we define the cluster groups and labels.
+
+```{r defineGroups1, echo=FALSE}
+eset.labels <- character() # Empty vector to hold cluster labels
+eset.groups <- numeric() # Empty vector to hold cluster groups
+# Set the minimum number of members to be considered for the differential analysis
+minmembers<-2
+for (i in 1:length(c$lower)) { # Go through each cluster
+  # If the number of members is more than a minimum number of members
+  if (attr(c$lower[[i]], "members") > minmembers) { 
+    eset.labels<-append(eset.labels, labels(c$lower[[i]]))
+    eset.groups<-append(eset.groups, rep(i, length(labels(c$lower[[i]]))))
+  }
+}
+```
+
+Second, out of the matrix of transformed p-values we create the ExpressionSet, the design matrix, and the significance thresholds. The limma analysis is performed for each pair of clusters. The results of limma analysis are outputted into the `r paste(fn_degs)` file.
+
+```{r limmaOnClusters1, warning=FALSE}
+eset<-new("ExpressionSet", exprs=as.matrix(scale(mtx[, eset.labels])))
+# Make model matrix
+design<-model.matrix(~ 0+factor(eset.groups)) 
+colnames(design)<-paste("c", unique(eset.groups), sep="")
+# Create an empty square matrix to hold counts of DEGs
+degs.matrix<-matrix(0, length(c$lower), length(c$lower))
+colnames(degs.matrix)<-paste("c", seq(1,length(c$lower)), sep="")
+rownames(degs.matrix)<-paste("c", seq(1, length(c$lower)), sep="") 
+# Tweak p-value and log2 fold change cutoffs, and adjustment for multiple testing
+cutoff.pval <- 0.1
+cutoff.lfc <- log2(1)
+cutoff.adjust <- "fdr" # Use "fdr" or "none"
+unlink(fn_degs)
+for(i in colnames(design)){ 
+  for(j in colnames(design)){
+    # Test only unique pairs of clusters
+    if (as.numeric(sub("c", "", i)) < as.numeric(sub("c", "", j))) {
+      # Contrasts between two clusters
+      contrast.matrix<-makeContrasts(contrasts=paste(i, j, sep="-"), levels=design)
+      fit <- lmFit(eset, design) 
+      fit2 <- contrasts.fit(fit, contrast.matrix)
+      fit2 <- eBayes(fit2)
+      degs<-topTable(fit2, number=dim(exprs(eset))[[1]], adjust.method=cutoff.adjust, p.value=cutoff.pval, lfc=cutoff.lfc)
+      if(nrow(degs)>0) {
+        # Average values in clusters i and j
+        mtx.sub <- mtx[, eset.labels] # Subset of the original matrix for averaging
+        i.av<-rowMeans(matrix(mtx.sub[rownames(degs), eset.groups == as.numeric(sub("c", "", i))], nrow=nrow(degs)))
+        j.av<-rowMeans(matrix(mtx.sub[rownames(degs), eset.groups == as.numeric(sub("c", "", j))], nrow=nrow(degs)))
+        # Merge and convert the values
+        degs.pvals.log <- cbind(i.av, j.av)
+        degs.pvals <- matrix(0, nrow=nrow(degs.pvals.log), ncol=ncol(degs.pvals.log), dimnames=list(rownames(degs.pvals.log), c(i, j))) # Empty matrix to hold converted p
+        for (ii in 1:nrow(degs.pvals.log)) {
+          for (jj in 1:ncol(degs.pvals.log)) {
+            if (degs.pvals.log[ii, jj] < 0) {sign = -1} else {sign = 1}
+            degs.pvals[ii, jj] <- sign/10^abs(degs.pvals.log[ii, jj])
+          }
+        }
+        degs <- cbind(degs, degs.pvals) # Bind the differences p-values with the converted averaged association p-values
+        degs <- degs[ degs$adj.P.Val < cutoff.pval & (abs(degs[, 7]) < 0.01 | abs(degs[, 8]) < 0.01), ] # Filter non-significant differences. Warning: Hardcoded thresholds
+        if(dim(degs)[[1]] > 0) {
+          degs <- degs[order(degs$adj.P.Val, decreasing=F), ] # Order them by the significance of the differences
+          print(paste(i, "vs.", j, ", number of degs significant at adj.p.val <", cutoff.pval, ":", nrow(degs)))
+          # Keep the number of DEGs in the matrix
+          degs.matrix[as.numeric(sub("c", "", i)), as.numeric(sub("c", "", j))] <- nrow(degs)
+          degs.table <- merge(degs, gfAnnot, by.x="row.names", by.y="V1", all.x=TRUE, sort=FALSE) # Merge with the descriptions
+          # Print top most significant differences
+          if(nrow(degs.table) > 10) {
+            print(paste("Top 10 differential marks"))
+            pandoc.table(degs.table[1:10, c(1, 8, 9, 6, 10)])
+          } else {
+            print(paste("Total", nrow(degs.table), "differential marks"))
+            pandoc.table(degs.table[1:nrow(degs.table), c(1, 8, 9, 6, 10)])
+          }
+          # Separate the total table into GF specific tables
+          # Print each GF specific table
+          degs.list <- list(); gfs.names <- c("Histone", "Tfbs", "BroadHmm")
+          for (g in gfs.names) {
+            degs.list <- c(degs.list, list(degs.table[ grepl(g, degs.table$Row.names), , drop=F]))
+          }
+          for (i in 1:length(gfs.names)) {
+            if (nrow(degs.list[[i]]) > 10) {
+              print(paste("Top 10 differential", gfs.names[i], "marks, out of total", nrow(degs.list[[i]])))
+              pandoc.table(degs.list[[i]][1:10, c(1, 8, 9, 6, 10)])
+            } else if (nrow(degs.list[[i]]) > 0) {
+              print(paste("Total", nrow(degs.list[[i]]), "differential", gfs.names[i], "marks"))
+              pandoc.table(degs.list[[i]][1:nrow(degs.list[[i]]), c(1, 8, 9, 6, 10)])
+            }
+          }
+          write.table(degs.table[, c(1, 8, 9, 6, 10)], fn_degs, sep="\t", quote=F,  col.names=NA, append=T)
+        }
+      }
+    } 
+  }
+}
+print("Counts of regulatory elements differentially associated with each group")
+pander(degs.matrix)
+```
+
+```{r results='hide'}
+# Having the enrichment matrix, we summarize it by max p-value, and extract values for selected marks.
+mtx.sum_h <- mtx.summarize(mtx, factor="Histone", cell=cells, fName=fn_sum_h)
+write.table(mtx.sum_h[rev(h$rowInd), ], sub("hist", "hist_sel", fn_sum_h), sep="\t", col.names=NA, quote=F) # Save selected marks in a separate file with "_sel" postfix
+mtx.sum_t <- mtx.summarize(mtx, factor="Tfbs", cell=cells, fName=fn_sum_t)
+write.table(mtx.sum_t[rev(h$rowInd), ], sub("tfbs", "tfbs_sel", fn_sum_t), sep="\t", col.names=NA, quote=F) # Save selected marks in a separate file with "_sel" postfix
+mtx.sum_c <- mtx.summarize(mtx, factor="BroadHmm", cell=cells, fName=fn_sum_c)
+write.table(mtx.sum_c[rev(h$rowInd), ], sub("chrom", "chrom_sel", fn_sum_c), sep="\t", col.names=NA, quote=F) # Save selected marks in a separate file with "_sel" postfix
+```
+
+Histone modification marks enrichment overview
+---
+```{r fig.height=5.5}
+#dev.off()
+mtx.plot <- mtx.trim.numofsig(mtx.transform(mtx.sum_h), pval=0.1, numofsig=5)
+marks_h <- c("EZH2", "H3K4ME2", "H3K27ME3", "H2AZ", "H3K4ME1", "RBBP5", "CHD1", "HDAC2", "CHD7", "H3K4ME3", "H3K9AC", "PHF8", "HDAC6", "JMJD2A", "P300", "SUZ12", "PLU1", "SAP30", "H4K20ME1", "SIRT6", "CTCF", "JARID1A", "H3K27AC", "H3K79ME2", "H3K9ME3", "H3K36ME3", "CTCF", "H3K4ME2", "H3K9AC", "H4K20ME1", "JARID1A", "RBBP5", "SUZ12", "H3K4ME3", "HDAC2", "JMJD2A", "PHF8", "SAP30", "H3K9ME3", "H3K27AC", "H3K36ME3", "H3K79ME2")
+SideColors <- as.vector(rev(green2red(length(marks_h))))
+names(SideColors) <- marks_h
+#RowSideColors <- RowSideColors[colnames(mtx.plot)]
+par(oma=c(2,0,0,8), mar=c(2, 0, 0, 8), cex.main=0.65) 
+heatmap.2(mtx.plot, distfun=function(x){dist(x,method=dist.method)}, hclustfun=function(x){hclust(x,method=hclust.method)}, dendrogram="none",  col=color, key=T,  symkey=T, keysize=1.1, density.info="none", trace="none",  cexCol=0.8, cexRow=1, scale="row", srtCol=45, ColSideColors=SideColors[colnames(mtx.plot)])
+```
+
+Transcription factor binding sites enrichment overview
+---
+```{r fig.height=5.5}
+#dev.off()
+mtx.plot <- mtx.trim.numofsig(mtx.transform(mtx.sum_t), pval=0.1, numofsig=9)
+marks_t <- c("SIN3A", "Znf143", "CtBP2", "Bach1", "Max", "Rad21", "RAD21", "TBP", "E2F6", "EZH2_(39875)", "Mxi1", "CHD1_(A301-218A)", "CHD2", "NRSF", "SUZ12", "CHD1", "CTCF_(SC-5916)", "GABP", "GTF2F1", "JunD", "SP1", "TEAD4", "YY1", "c-Myc", "CEBPB", "CTCF", "Pol2", "Pol2-4H8", "RBBP5_(A300-109A)", "RXRA", "Sin3Ak-20", "TAF1", "TAF7", "TCF12", "TEAD4_(SC-101184)", "Znf143_(16618-1-AP)", "BCL11A", "BRCA1", "c-Jun", "CREB1", "HDAC2", "HDAC2_(SC-6296)", "MafK", "MafK_(ab50322)", "Mxi1_(AF4185)", "NANOG", "Nrf1", "POU5F1", "USF2", "ZNF274", "ATF2_(SC-81188)", "c-Jun", "E2F6", "Max", "POU5F1", "Rad21", "RFX5", "SUZ12", "TEAD4", "Bach1", "CtBP2", "Egr-1", "p300", "SIN3A", "SRF", "USF2", "ATF3", "BRCA1_(A300-000A)", "CHD1", "GABP", "Mxi1", "SIN3A_(NB600-1263)", "Znf143", "BRCA1", "CHD2", "CHD2_(AB68301)", "GTF2F1", "GTF2F1_(AB28179)", "RBBP5_(A300-109A)", "SIX5", "TAF7_(SC-101167)", "TBP", "YY1", "YY1_(SC-281)", "c-Myc", "JunD", "SP2", "SP2_(SC-643)", "CREB1", "Nrf1", "Sin3Ak-20", "SP4_(V-20)", "ATF2", "SP4", "TAF1", "Pol2-4H8", "SP1", "TAF7", "JARID1A_(ab26049)", "Pol2")
+SideColors <- as.vector(rev(green2red(length(marks_t))))
+names(SideColors) <- marks_t
+par(oma=c(2,0,0,8), mar=c(2, 0, 0, 8), cex.main=0.65) 
+heatmap.2(mtx.plot, distfun=function(x){dist(x,method=dist.method)}, hclustfun=function(x){hclust(x,method=hclust.method)}, dendrogram="none",  col=color, key=T,  symkey=T, keysize=1.1, density.info="none", trace="none",  cexCol=0.8, cexRow=1, scale="row", srtCol=45, ColSideColors=SideColors[colnames(mtx.plot)])
+```
+
+Chromatin states enrichment overview
+---
+```{r fig.height=5.5}
+#dev.off()
+mtx.plot <- mtx.trim.numofsig(mtx.transform(mtx.sum_c), pval=0.1, numofsig=2)
+marks_c <- c("3_Poised_Promoter", "2_Weak_Promoter", "6_Weak_Enhancer", "4_Strong_Enhancer", "7_Weak_Enhancer", "1_Active_Promoter", "12_Repressed", "5_Strong_Enhancer", "9_Txn_Transition", "13_Heterochrom/lo", "15_Repetitive/CNV", "8_Insulator", "12_Repressed", "14_Repetitive/CNV", "15_Repetitive/CNV", "2_Weak_Promoter", "6_Weak_Enhancer", "7_Weak_Enhancer", "9_Txn_Transition", "8_Insulator", "11_Weak_Txn", "1_Active_Promoter", "10_Txn_Elongation", "13_Heterochrom/lo")
+SideColors <- as.vector(rev(green2red(length(marks_c))))
+names(SideColors) <- marks_c
+par(oma=c(2,0,0,8), mar=c(2, 0, 0, 8), cex.main=0.65) 
+heatmap.2(mtx.plot, distfun=function(x){dist(x,method=dist.method)}, hclustfun=function(x){hclust(x,method=hclust.method)}, dendrogram="none",  col=color, key=T,  symkey=T, keysize=1.1, density.info="none", trace="none",  cexCol=0.8, cexRow=1, scale="row", srtCol=45, ColSideColors=SideColors[colnames(mtx.plot)])
+```
+
+Regulatory similarity among datasets using emryonic cell lines
+===
+Pos/neg markers only
+---
+```{r}
+# Set up the file names to output the results
+fn_degs <- "results/degs_posneg_embryo.txt" # Differential GFs among the clusters
+```
+
+```{r posnegHeat, fig.height=6}
+mtx1 <- mtx.subset("../GenomeRunner/ALL//all_encBroadHmm.txt", factor=gfs_posneg, cell=paste(cells, collapse="|"))
+mtx2 <- mtx.subset("../GenomeRunner/ALL//all_encHistone.txt", factor=gfs_posneg, cell=paste(cells, collapse="|"))
+mtx3 <- mtx.subset("../GenomeRunner/ALL//all_encTfbs.txt", factor=gfs_posneg, cell=paste(cells, collapse="|"))
+mtx <- rbind(mtx1, mtx2[, colnames(mtx1)], mtx3[, colnames(mtx1)])
+mtx.cor<-rcorr(as.matrix(mtx), type=correl)
+# Plotting
+par(oma=c(10,0,0,12), mar=c(10, 4.1, 4.1, 10), cex.main=0.65) # Adjust margins# Setting breaks to go from minimum to maximum correlation coefficients,
+# excluding min/max outliers. This way we get rid of diagonale of 1's
+my.breaks <- seq(min(mtx.cor[[1]][mtx.cor[[1]]!=min(mtx.cor[[1]])]),
+                 max(mtx.cor[[1]][mtx.cor[[1]]!=max(mtx.cor[[1]])]),
+                 length.out=(2*granularity + 1))
+marks_sets <- c("Reynolds_aDMRs_monocytes_pos","Heyn_aDMRs_neg","Alisch_aDMRs_neg","Reynolds_aDMRs_tcells_neg","Reynolds_aDMRs_monocytes_neg","deMagalhaes_genes_neg","deMagalhaes_genes_pos","Heyn_aDMRs_pos","Hannum_genes_predictive_neg","Hannum_genes_predictive_pos","Reynolds_aDMRs_tcells_pos","Alisch_aDMRs_pos")
+SideColors <- c("white", rep("red", 4), rep("green", 9))
+names(SideColors) <- marks_sets
+h <- heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="Regulatory similarity clustering", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks, ColSideColors=SideColors[colnames(as.matrix(mtx.cor[[1]]))])
+print("Distribution of correlation coefficients")
+(summary(mtx.cor[[1]][upper.tri(mtx.cor[[1]])]))
+print("Distribution of p-values")
+summary(mtx.cor[[3]][upper.tri(mtx.cor[[3]])])
+```
+
+Regulatory differences among the clusters (Differential enrichment analysis)
+---
+
+The heatmap object contains information about the order of the clustering. We visualized this information as a dendrogram, cut into separate clusters.
+
+```{r defineClusters2, echo=FALSE, dependson="posnegHeat"}
+par(oma=c(0, 0, 0, 0), mar=c(5.1, 4.1, 4.1,25.1), cex=0.5)
+# Plot the dendrogram only, limit y axis. attr(h$colDendrogram, "height") has the maximum height of the dendrogram.
+plot(h$colDendrogram, horiz=T) 
+# Cut the dentrogram into separate clusters. Tweak the height
+abline(v=1.5) # Visually evaluate the height where to cut
+c <- cut(h$colDendrogram, h=1.5) 
+# Check the number of clusters, and the number of members.
+for (i in 1:length(c$lower)) {
+  cat(paste("Cluster", formatC(i, width=2, flag="0"), sep=""), "has", formatC(attr(c$lower[[i]], "members"), width=3), "members", "\n")
+}
+```
+
+The epigenomic enrichment p-values are -log10-transformed. The distributions of these transformed p-values can be tested for the statistically significant differences among the clusters using the Bioconductor *limma* package.
+
+First, we define the cluster groups and labels.
+
+```{r defineGroups2, echo=FALSE, dependson="defineClusters2"}
+eset.labels <- character() # Empty vector to hold cluster labels
+eset.groups <- numeric() # Empty vector to hold cluster groups
+# Set the minimum number of members to be considered for the differential analysis
+minmembers<-2
+for (i in 1:length(c$lower)) { # Go through each cluster
+  # If the number of members is more than a minimum number of members
+  if (attr(c$lower[[i]], "members") > minmembers) { 
+    eset.labels<-append(eset.labels, labels(c$lower[[i]]))
+    eset.groups<-append(eset.groups, rep(i, length(labels(c$lower[[i]]))))
+  }
+}
+```
+
+Second, out of the matrix of transformed p-values we create the ExpressionSet, the design matrix, and the significance thresholds. The limma analysis is performed for each pair of clusters. The results of limma analysis are outputted into the `r paste(fn_degs)` file.
+
+```{r limmaOnClusters2, warning=FALSE, dependson="defineGroups2"}
+eset<-new("ExpressionSet", exprs=as.matrix(scale(mtx[, eset.labels])))
+# Make model matrix
+design<-model.matrix(~ 0+factor(eset.groups)) 
+colnames(design)<-paste("c", unique(eset.groups), sep="")
+# Create an empty square matrix to hold counts of DEGs
+degs.matrix<-matrix(0, length(c$lower), length(c$lower))
+colnames(degs.matrix)<-paste("c", seq(1,length(c$lower)), sep="")
+rownames(degs.matrix)<-paste("c", seq(1, length(c$lower)), sep="") 
+# Tweak p-value and log2 fold change cutoffs, and adjustment for multiple testing
+cutoff.pval <- 0.1
+cutoff.lfc <- log2(1)
+cutoff.adjust <- "fdr" # Use "fdr" or "none"
+unlink(fn_degs)
+for(i in colnames(design)){ 
+  for(j in colnames(design)){
+    # Test only unique pairs of clusters
+    if (as.numeric(sub("c", "", i)) < as.numeric(sub("c", "", j))) {
+      # Contrasts between two clusters
+      contrast.matrix<-makeContrasts(contrasts=paste(i, j, sep="-"), levels=design)
+      fit <- lmFit(eset, design) 
+      fit2 <- contrasts.fit(fit, contrast.matrix)
+      fit2 <- eBayes(fit2)
+      degs<-topTable(fit2, number=dim(exprs(eset))[[1]], adjust.method=cutoff.adjust, p.value=cutoff.pval, lfc=cutoff.lfc)
+      if(nrow(degs)>0) {
+        # Average values in clusters i and j
+        mtx.sub <- mtx[, eset.labels] # Subset of the original matrix for averaging
+        i.av<-rowMeans(matrix(mtx.sub[rownames(degs), eset.groups == as.numeric(sub("c", "", i))], nrow=nrow(degs)))
+        j.av<-rowMeans(matrix(mtx.sub[rownames(degs), eset.groups == as.numeric(sub("c", "", j))], nrow=nrow(degs)))
+        # Merge and convert the values
+        degs.pvals.log <- cbind(i.av, j.av)
+        degs.pvals <- matrix(0, nrow=nrow(degs.pvals.log), ncol=ncol(degs.pvals.log), dimnames=list(rownames(degs.pvals.log), c(i, j))) # Empty matrix to hold converted p
+        for (ii in 1:nrow(degs.pvals.log)) {
+          for (jj in 1:ncol(degs.pvals.log)) {
+            if (degs.pvals.log[ii, jj] < 0) {sign = -1} else {sign = 1}
+            degs.pvals[ii, jj] <- sign/10^abs(degs.pvals.log[ii, jj])
+          }
+        }
+        degs <- cbind(degs, degs.pvals) # Bind the differences p-values with the converted averaged association p-values
+        degs <- degs[ degs$adj.P.Val < cutoff.pval & (abs(degs[, 7]) < 0.01 | abs(degs[, 8]) < 0.01), ] # Filter non-significant differences. Warning: Hardcoded thresholds
+        if(dim(degs)[[1]] > 0) {
+          degs <- degs[order(degs$adj.P.Val, decreasing=F), ] # Order them by the significance of the differences
+          print(paste(i, "vs.", j, ", number of degs significant at adj.p.val <", cutoff.pval, ":", nrow(degs)))
+          # Keep the number of DEGs in the matrix
+          degs.matrix[as.numeric(sub("c", "", i)), as.numeric(sub("c", "", j))] <- nrow(degs)
+          degs.table <- merge(degs, gfAnnot, by.x="row.names", by.y="V1", all.x=TRUE, sort=FALSE) # Merge with the descriptions
+          # Print top most significant differences
+          if(nrow(degs.table) > 10) {
+            print(paste("Top 10 differential marks"))
+            pandoc.table(degs.table[1:10, c(1, 8, 9, 6, 10)])
+          } else {
+            print(paste("Total", nrow(degs.table), "differential marks"))
+            pandoc.table(degs.table[1:nrow(degs.table), c(1, 8, 9, 6, 10)])
+          }
+          # Separate the total table into GF specific tables
+          # Print each GF specific table
+          degs.list <- list(); gfs.names <- c("Histone", "Tfbs", "BroadHmm")
+          for (g in gfs.names) {
+            degs.list <- c(degs.list, list(degs.table[ grepl(g, degs.table$Row.names), , drop=F]))
+          }
+          for (i in 1:length(gfs.names)) {
+            if (nrow(degs.list[[i]]) > 10) {
+              print(paste("Top 10 differential", gfs.names[i], "marks, out of total", nrow(degs.list[[i]])))
+              pandoc.table(degs.list[[i]][1:10, c(1, 8, 9, 6, 10)])
+            } else if (nrow(degs.list[[i]]) > 0) {
+              print(paste("Total", nrow(degs.list[[i]]), "differential", gfs.names[i], "marks"))
+              pandoc.table(degs.list[[i]][1:nrow(degs.list[[i]]), c(1, 8, 9, 6, 10)])
+            }
+          }
+          write.table(degs.table[, c(1, 8, 9, 6, 10)], fn_degs, sep="\t", quote=F,  col.names=NA, append=T)
+        }
+      }
+    } 
+  }
+}
+print("Counts of regulatory elements differentially associated with each group")
+pander(degs.matrix)
+```
+
+
+Regulatory similarity among datasets using all cell lines
+===
+```{r fig.height=6}
+mtx1 <- mtx.subset("../GenomeRunner/ALL//all_encBroadHmm.txt", factor=gfs_all, cell="")
+mtx2 <- mtx.subset("../GenomeRunner/ALL//all_encHistone.txt", factor=gfs_all, cell="")
+mtx3 <- mtx.subset("../GenomeRunner/ALL//all_encTfbs.txt", factor=gfs_all, cell="")
+mtx <- rbind(mtx1, mtx2[, colnames(mtx1)], mtx3[, colnames(mtx1)])
+mtx.cor<-rcorr(as.matrix(mtx), type=correl)
+# Plotting
+par(oma=c(10,0,0,10), mar=c(10, 4.1, 4.1, 10), cex.main=0.65) # Adjust margins
+# Setting breaks to go from minimum to maximum correlation coefficients,
+# excluding min/max outliers. This way we get rid of diagonale of 1's
+my.breaks <- seq(min(mtx.cor[[1]][mtx.cor[[1]]!=min(mtx.cor[[1]])]),
+                 max(mtx.cor[[1]][mtx.cor[[1]]!=max(mtx.cor[[1]])]),
+                 length.out=(2*granularity + 1))
+h<-heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="Regulatory similarity clustering", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks)
+print("Distribution of correlation coefficients")
+(summary(mtx.cor[[1]][upper.tri(mtx.cor[[1]])]))
+print("Distribution of p-values")
+summary(mtx.cor[[3]][upper.tri(mtx.cor[[3]])])
+```
+
+Cell line similarity
+===
+```{r eval=F}
+# RUN ONCE, time consuming. This will create the matrix for cell-cell regulatory correlations
+# For each matrix, collect the list of heatmap carpets and merge them
+h1.list <- list() # BroadHmm
+for (i in 1:33) {
+  print(i)
+  h1.list <- c(h1.list, list(
+    showHeatmap("../GenomeRunner/ALL/all_encBroadHmm.txt", colnum=i, factor="name", cell="none", isLog10=TRUE, adjust="none", pval=1, numtofilt=1, toPlot="heat")))  
+}
+h1.df = Reduce(function(...) merge(..., all=T), h1.list)
+
+h2.list <- list() # Histone
+for (i in seq(1:33)) {
+  print(i)
+  h2.list <- c(h2.list, list(
+    data.frame(showHeatmap("../GenomeRunner/ALL/all_encHistone.txt", colnum=i, factor="none", cell="none", isLog10=TRUE, adjust="none", pval=1, numtofilt=10, toPlot="heat"))))
+}
+h2.df = Reduce(function(...) merge(..., all=T), h2.list)
+
+h3.list <- list() # Tfbs
+for (i in seq(1:33)[-29]) {
+  print(i)
+  h3.list <- c(h3.list, list(
+    showHeatmap("../GenomeRunner/ALL/all_encTfbs.txt", colnum=i, factor="none", cell="none", isLog10=TRUE, adjust="none", pval=1, numtofilt=10, toPlot="heat")))
+}
+h3.df = Reduce(function(...) merge(..., all=T), h3.list)
+
+Reduce(function(...) intersect(...), list(colnames(h1.df), colnames(h2.df), colnames(h3.df))) # How all 3 lists overlap, what are the common cell lines
+
+intersect(colnames(h1.df), colnames(h2.df)) # What are the common cell lines between BroadHmm and Histone datasets
+# Combine matrix
+mtx <- rbind(h1.df[, intersect(colnames(h1.df), colnames(h2.df))],
+             h2.df[, intersect(colnames(h1.df), colnames(h2.df))])
+# Save the combined matrix
+write.table(mtx, "../GenomeRunner/ALL/cell_BroadHmm_Histone.txt", sep="\t", quote=F, col.names=NA)
+```
+
+```{r fig.height=5}
+mtx <- read.table("../GenomeRunner/ALL/cell_BroadHmm_Histone.txt", sep="\t", header=T, row.names=1, stringsAsFactors=F)
+mtx.cor<-rcorr(as.matrix(mtx), type=correl)
+# Setting breaks to go from minimum to maximum correlation coefficients,
+# excluding min/max outliers. This way we get rid of diagonale of 1's
+my.breaks <- seq(min(mtx.cor[[1]][mtx.cor[[1]]!=min(mtx.cor[[1]])]),
+                 max(mtx.cor[[1]][mtx.cor[[1]]!=max(mtx.cor[[1]])]),
+                 length.out=(2*granularity + 1))
+hclust.method <- "single"
+h<-heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="Regulatory similarity clustering", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks)
+print("Distribution of correlation coefficients")
+diag(mtx.cor[[1]]) <- 0 # Eliminate self correlations
+(summary(mtx.cor[[1]][upper.tri(mtx.cor[[1]])]))
+print("Distribution of p-values")
+summary(mtx.cor[[3]][upper.tri(mtx.cor[[3]])])
+```
+

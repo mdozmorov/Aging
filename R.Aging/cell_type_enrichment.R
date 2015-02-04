@@ -31,12 +31,6 @@ mtx.count <- read.table(fname, sep="\t", header=F, stringsAsFactors=F)
 mtx.count <- ddply(mtx.count, "V1", summarise, sum(V2), sum(V3))
 colnames(mtx.count) <- c("V1", "V2", "V3")
 sig <- sum(mtx.count$V2) # Count of all significant cell lines
-tot <- sum(mtx.count$V3) # Count of all tested cell lines
-cell.2x2 <- matrix(c(mtx.count$V2[i], mtx.count$V3[i] - mtx.count$V2[i],
-sig - mtx.count$V2[i], tot - sig - (mtx.count$V3[i] - mtx.count$V2[i])),
-ncol=2, dimnames=list(c("sig", "not sig"), c("selected", "not selected")))
-p <- c(p, list(fisher.test(cell.2x2)$p.value))
-sig <- sum(mtx.count$V2) # Count of all significant cell lines
 tot <- sum(mtx.count$V3) # Count of all tested cell linesi
 p <- list() # List to store p-values
 for (i in 1:nrow(mtx.count)) {

@@ -7,7 +7,7 @@ output: html_document
 ```{r setup, echo=FALSE, include=FALSE, cache=FALSE}
 # Set up the environment
 library(knitr) 
-opts_chunk$set(cache.path='cache/', fig.path='img/', cache=F, tidy=T, fig.keep='high', dpi=200,  echo=F, autodep=T, width=200, warning=FALSE, comment=NA)
+opts_chunk$set(cache.path='cache/', fig.path='img/', cache=F, tidy=T, fig.keep='high', dpi=300,  echo=F, autodep=T, width=200, warning=FALSE, comment=NA)
 options(replace.assign=TRUE, width=500)
 tidy.opts=list(width.cutoff=200)
 suppressMessages(library(pander))
@@ -40,13 +40,72 @@ color <- matlab.like
 dist.method <- "euclidean"  
 hclust.method <- "average"
 granularity <- 10
+dev.out <- 'pdf' # 'png' or 'pdf'
 ```
 
-Regulatory similarity among datasets using emryonic cell lines
+Epigenomic similarity among cell lines
+===
+Cell type-specific epigenomic enrichment profiles (see Methods) were correlated with each other using Spearman correlation coefficient. The resulting correlation matrix was clustered using Euclidean/average clustering metrics, and visualized with darker blue/red gradient representing weaker/stronger epigenomic similarity, respectively. Each cell shows numerical value of the corresponding Spearman correlation coefficient.
+
+```{r eval=F}
+# RUN ONCE, time consuming. This will create the matrix for cell-cell regulatory correlations
+# For each matrix, collect the list of heatmap carpets and merge them
+h1.list <- list() # BroadHmm
+for (i in 1:33) {
+  print(i)
+  h1.list <- c(h1.list, list(
+    showHeatmap("../GenomeRunner/ALL/all_encBroadHmm.txt", colnum=i, factor="name", cell="none", isLog10=TRUE, adjust="none", pval=1, numtofilt=1, toPlot="heat")))  
+}
+h1.df = Reduce(function(...) merge(..., all=T), h1.list)
+
+h2.list <- list() # Histone
+for (i in seq(1:33)) {
+  print(i)
+  h2.list <- c(h2.list, list(
+    data.frame(showHeatmap("../GenomeRunner/ALL/all_encHistone.txt", colnum=i, factor="none", cell="none", isLog10=TRUE, adjust="none", pval=1, numtofilt=10, toPlot="heat"))))
+}
+h2.df = Reduce(function(...) merge(..., all=T), h2.list)
+
+h3.list <- list() # Tfbs
+for (i in seq(1:33)[-29]) {
+  print(i)
+  h3.list <- c(h3.list, list(
+    showHeatmap("../GenomeRunner/ALL/all_encTfbs.txt", colnum=i, factor="none", cell="none", isLog10=TRUE, adjust="none", pval=1, numtofilt=10, toPlot="heat")))
+}
+h3.df = Reduce(function(...) merge(..., all=T), h3.list)
+
+Reduce(function(...) intersect(...), list(colnames(h1.df), colnames(h2.df), colnames(h3.df))) # How all 3 lists overlap, what are the common cell lines
+
+intersect(colnames(h1.df), colnames(h2.df)) # What are the common cell lines between BroadHmm and Histone datasets
+# Combine matrix
+mtx <- rbind(h1.df[, intersect(colnames(h1.df), colnames(h2.df))],
+             h2.df[, intersect(colnames(h1.df), colnames(h2.df))])
+# Save the combined matrix
+write.table(mtx, "../GenomeRunner/ALL/cell_BroadHmm_Histone.txt", sep="\t", quote=F, col.names=NA)
+```
+
+```{r fig1-cell_episimilarity, fig.height=5, dev=dev.out}
+mtx <- read.table("../GenomeRunner/ALL/cell_BroadHmm_Histone.txt", sep="\t", header=T, row.names=1, stringsAsFactors=F)
+mtx.cor<-rcorr(as.matrix(mtx), type=correl)
+# Setting breaks to go from minimum to maximum correlation coefficients,
+# excluding min/max outliers. This way we get rid of diagonale of 1's
+my.breaks <- seq(min(mtx.cor[[1]][mtx.cor[[1]]!=min(mtx.cor[[1]])]),
+                 max(mtx.cor[[1]][mtx.cor[[1]]!=max(mtx.cor[[1]])]),
+                 length.out=(2*granularity + 1))
+hclust.method <- "single"
+h<-heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks)
+print("Distribution of correlation coefficients")
+diag(mtx.cor[[1]]) <- 0 # Eliminate self correlations
+(summary(mtx.cor[[1]][upper.tri(mtx.cor[[1]])]))
+print("Distribution of p-values")
+summary(mtx.cor[[3]][upper.tri(mtx.cor[[3]])])
+```
+
+Epigenomic similarity among sets of aDMRs and aGENs
 ===
 
-All markers, excluding pos/neg
----
+aDMRs-and aGENs epigenomic enrichment profiles obtained from H1hesc epigenomic data (see Methods) were correlated with each other using Spearman correlation coefficient. The resulting correlation matrix was culstered using Euclidean/average clustering metrics, and visualized with darker blue/red gradient representing weaker/stronger epigenomic similarity, respectively. Each cell shows the numerical value of the corresponding Spearman correlation coefficient. Red/green bars define groups of aDMRs and aGENs showing high inter-group similarity.
+
 ```{r}
 # Set up the file names to output the results
 fn_degs <- "results/degs_all_embryo.txt" # Differential GFs among the clusters
@@ -54,10 +113,7 @@ fn_sum_h <- "results/summary_all_embryo_hist.txt" # Summarized enrichment result
 fn_sum_t <- "results/summary_all_embryo_tfbs.txt" # Summarized enrichment results, TFBSs
 fn_sum_c <- "results/summary_all_embryo_chrom.txt" # Summarized enrichment results, chromstates
 ```
-
-For each pair of aDMRs and aGENs, we calculated epigenomic similarity coefficient (Spearman correlation coefficient between corresponding epigenomic enrichment profiles). The matrix of epigenomic similarity coefficients is visualized as a heatmap, with blue/red gradient correspontind to low/high epigenomic similarity between the profiles.
-
-```{r fig.height=6}
+```{r fig2-admrs-agens_episimilarity, fig.height=6, dev=dev.out}
 mtx1 <- mtx.subset("../GenomeRunner/ALL//all_encBroadHmm.txt", factor=gfs_all, cell=paste(cells, collapse="|"))
 mtx2 <- mtx.subset("../GenomeRunner/ALL//all_encHistone.txt", factor=gfs_all, cell=paste(cells, collapse="|"))
 mtx3 <- mtx.subset("../GenomeRunner/ALL//all_encTfbs.txt", factor=gfs_all, cell=paste(cells, collapse="|"))
@@ -73,7 +129,7 @@ my.breaks <- seq(min(mtx.cor[[1]][mtx.cor[[1]]!=min(mtx.cor[[1]])]),
 marks_sets <- c("deMagalhaes_genes_all", "Heyn_aDMRs", "Reynolds_aDMRs_monocytes", "Alisch_aDMRs_all", "Steegenga_aDMRs_meta", "Hannum_aDMRs_primary", "Hannum_aDMRs_all", "Hannum_genes_predictive", "genes_LongevityMap", "Hannum_genes_associated", "Reynolds_aDMRs_tcells", "Rakyan_aDMRs_all", "Steegenga_aDMRs_and_gene", "Steegenga_aDMRs_not_gene")
 SideColors <- c("white", rep("red", 4), rep("green", 9))
 names(SideColors) <- marks_sets
-h <- heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="Regulatory similarity clustering", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks, ColSideColors=SideColors[colnames(as.matrix(mtx.cor[[1]]))])
+h <- heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks, ColSideColors=SideColors[colnames(as.matrix(mtx.cor[[1]]))])
 print("Distribution of correlation coefficients")
 diag(mtx.cor[[1]]) <- 0 # Eliminate self correlations
 (summary(mtx.cor[[1]][upper.tri(mtx.cor[[1]])]))
@@ -213,16 +269,20 @@ pander(degs.matrix)
 ```{r results='hide'}
 # Having the enrichment matrix, we summarize it by max p-value, and extract values for selected marks.
 mtx.sum_h <- mtx.summarize(mtx, factor="Histone", cell=cells, fName=fn_sum_h)
-write.table(mtx.sum_h[rev(h$rowInd), ], sub("hist", "hist_sel", fn_sum_h), sep="\t", col.names=NA, quote=F) # Save selected marks in a separate file with "_sel" postfix
+# write.table(mtx.sum_h[rev(h$rowInd), ], sub("hist", "hist_sel", fn_sum_h), sep="\t", col.names=NA, quote=F) # Save selected marks in a separate file with "_sel" postfix
 mtx.sum_t <- mtx.summarize(mtx, factor="Tfbs", cell=cells, fName=fn_sum_t)
-write.table(mtx.sum_t[rev(h$rowInd), ], sub("tfbs", "tfbs_sel", fn_sum_t), sep="\t", col.names=NA, quote=F) # Save selected marks in a separate file with "_sel" postfix
+# write.table(mtx.sum_t[rev(h$rowInd), ], sub("tfbs", "tfbs_sel", fn_sum_t), sep="\t", col.names=NA, quote=F) # Save selected marks in a separate file with "_sel" postfix
 mtx.sum_c <- mtx.summarize(mtx, factor="BroadHmm", cell=cells, fName=fn_sum_c)
-write.table(mtx.sum_c[rev(h$rowInd), ], sub("chrom", "chrom_sel", fn_sum_c), sep="\t", col.names=NA, quote=F) # Save selected marks in a separate file with "_sel" postfix
+# write.table(mtx.sum_c[rev(h$rowInd), ], sub("chrom", "chrom_sel", fn_sum_c), sep="\t", col.names=NA, quote=F) # Save selected marks in a separate file with "_sel" postfix
 ```
 
-Histone modification marks enrichment overview
+Epigenomic datasets showing enrichment/depletion in aDMRs and aGENs
+===
+Darker blue/red gradient highlights depleted/enriched associations. Red/green bars define epigenomic datasets depleted/enriched in aDMRs and aGENs.
+
+A) Histone modification marks and modifiers
 ---
-```{r fig.height=5.5}
+```{r fig3a-enrichment_histone, fig.height=5.5, dev=dev.out}
 #dev.off()
 mtx.plot <- mtx.trim.numofsig(mtx.transform(mtx.sum_h), pval=0.1, numofsig=5)
 marks_h <- c("EZH2", "H3K4ME2", "H3K27ME3", "H2AZ", "H3K4ME1", "RBBP5", "CHD1", "HDAC2", "CHD7", "H3K4ME3", "H3K9AC", "PHF8", "HDAC6", "JMJD2A", "P300", "SUZ12", "PLU1", "SAP30", "H4K20ME1", "SIRT6", "CTCF", "JARID1A", "H3K27AC", "H3K79ME2", "H3K9ME3", "H3K36ME3", "CTCF", "H3K4ME2", "H3K9AC", "H4K20ME1", "JARID1A", "RBBP5", "SUZ12", "H3K4ME3", "HDAC2", "JMJD2A", "PHF8", "SAP30", "H3K9ME3", "H3K27AC", "H3K36ME3", "H3K79ME2")
@@ -233,9 +293,9 @@ par(oma=c(2,0,0,8), mar=c(2, 0, 0, 8), cex.main=0.65)
 heatmap.2(mtx.plot, distfun=function(x){dist(x,method=dist.method)}, hclustfun=function(x){hclust(x,method=hclust.method)}, dendrogram="none",  col=color, key=T,  symkey=T, keysize=1.1, density.info="none", trace="none",  cexCol=0.8, cexRow=1, scale="row", srtCol=45, ColSideColors=SideColors[colnames(mtx.plot)])
 ```
 
-Transcription factor binding sites enrichment overview
+B) Transcription factor binding sites
 ---
-```{r fig.height=5.5}
+```{r fig3b-enrichment_tfbs, fig.height=5.5, dev=dev.out}
 #dev.off()
 mtx.plot <- mtx.trim.numofsig(mtx.transform(mtx.sum_t), pval=0.1, numofsig=9)
 marks_t <- c("SIN3A", "Znf143", "CtBP2", "Bach1", "Max", "Rad21", "RAD21", "TBP", "E2F6", "EZH2_(39875)", "Mxi1", "CHD1_(A301-218A)", "CHD2", "NRSF", "SUZ12", "CHD1", "CTCF_(SC-5916)", "GABP", "GTF2F1", "JunD", "SP1", "TEAD4", "YY1", "c-Myc", "CEBPB", "CTCF", "Pol2", "Pol2-4H8", "RBBP5_(A300-109A)", "RXRA", "Sin3Ak-20", "TAF1", "TAF7", "TCF12", "TEAD4_(SC-101184)", "Znf143_(16618-1-AP)", "BCL11A", "BRCA1", "c-Jun", "CREB1", "HDAC2", "HDAC2_(SC-6296)", "MafK", "MafK_(ab50322)", "Mxi1_(AF4185)", "NANOG", "Nrf1", "POU5F1", "USF2", "ZNF274", "ATF2_(SC-81188)", "c-Jun", "E2F6", "Max", "POU5F1", "Rad21", "RFX5", "SUZ12", "TEAD4", "Bach1", "CtBP2", "Egr-1", "p300", "SIN3A", "SRF", "USF2", "ATF3", "BRCA1_(A300-000A)", "CHD1", "GABP", "Mxi1", "SIN3A_(NB600-1263)", "Znf143", "BRCA1", "CHD2", "CHD2_(AB68301)", "GTF2F1", "GTF2F1_(AB28179)", "RBBP5_(A300-109A)", "SIX5", "TAF7_(SC-101167)", "TBP", "YY1", "YY1_(SC-281)", "c-Myc", "JunD", "SP2", "SP2_(SC-643)", "CREB1", "Nrf1", "Sin3Ak-20", "SP4_(V-20)", "ATF2", "SP4", "TAF1", "Pol2-4H8", "SP1", "TAF7", "JARID1A_(ab26049)", "Pol2")
@@ -245,9 +305,9 @@ par(oma=c(2,0,0,8), mar=c(2, 0, 0, 8), cex.main=0.65)
 heatmap.2(mtx.plot, distfun=function(x){dist(x,method=dist.method)}, hclustfun=function(x){hclust(x,method=hclust.method)}, dendrogram="none",  col=color, key=T,  symkey=T, keysize=1.1, density.info="none", trace="none",  cexCol=0.8, cexRow=1, scale="row", srtCol=45, ColSideColors=SideColors[colnames(mtx.plot)])
 ```
 
-Chromatin states enrichment overview
+C) Chromatin states
 ---
-```{r fig.height=5.5}
+```{r fig3c-enrichment_chromstates, fig.height=5.5, dev=dev.out}
 #dev.off()
 mtx.plot <- mtx.trim.numofsig(mtx.transform(mtx.sum_c), pval=0.1, numofsig=2)
 marks_c <- c("3_Poised_Promoter", "2_Weak_Promoter", "6_Weak_Enhancer", "4_Strong_Enhancer", "7_Weak_Enhancer", "1_Active_Promoter", "12_Repressed", "5_Strong_Enhancer", "9_Txn_Transition", "13_Heterochrom/lo", "15_Repetitive/CNV", "8_Insulator", "12_Repressed", "14_Repetitive/CNV", "15_Repetitive/CNV", "2_Weak_Promoter", "6_Weak_Enhancer", "7_Weak_Enhancer", "9_Txn_Transition", "8_Insulator", "11_Weak_Txn", "1_Active_Promoter", "10_Txn_Elongation", "13_Heterochrom/lo")
@@ -257,16 +317,17 @@ par(oma=c(2,0,0,8), mar=c(2, 0, 0, 8), cex.main=0.65)
 heatmap.2(mtx.plot, distfun=function(x){dist(x,method=dist.method)}, hclustfun=function(x){hclust(x,method=hclust.method)}, dendrogram="none",  col=color, key=T,  symkey=T, keysize=1.1, density.info="none", trace="none",  cexCol=0.8, cexRow=1, scale="row", srtCol=45, ColSideColors=SideColors[colnames(mtx.plot)])
 ```
 
-Regulatory similarity among datasets using emryonic cell lines
+Epigenomic similarity among sets of aDMRs hyper/hypomethylated with age, and aGENs showing increasind/decreasing gene expression with age ("pos/neg" postfixes)
 ===
-Pos/neg markers only
----
+
+Pos/Neg aDMRs-and aGENs epigenomic enrichment profiles obtained from H1hesc epigenomic data (see Methods) were correlated with each other using Spearman correlation coefficient. The resulting correlation matrix was culstered using Euclidean/average clustering metrics, and visualized with darker blue/red gradient representing weaker/stronger epigenomic similarity, respectively. Each cell shows the numerical value of the corresponding Spearman correlation coefficient. Red/green bars define groups of aDMRs and aGENs showing high inter-group similarity.
+
 ```{r}
 # Set up the file names to output the results
 fn_degs <- "results/degs_posneg_embryo.txt" # Differential GFs among the clusters
 ```
 
-```{r posnegHeat, fig.height=6}
+```{r fig4-pos-neg_episimilarity, fig.height=6, dev=dev.out}
 mtx1 <- mtx.subset("../GenomeRunner/ALL//all_encBroadHmm.txt", factor=gfs_posneg, cell=paste(cells, collapse="|"))
 mtx2 <- mtx.subset("../GenomeRunner/ALL//all_encHistone.txt", factor=gfs_posneg, cell=paste(cells, collapse="|"))
 mtx3 <- mtx.subset("../GenomeRunner/ALL//all_encTfbs.txt", factor=gfs_posneg, cell=paste(cells, collapse="|"))
@@ -281,7 +342,7 @@ my.breaks <- seq(min(mtx.cor[[1]][mtx.cor[[1]]!=min(mtx.cor[[1]])]),
 marks_sets <- c("Reynolds_aDMRs_monocytes_pos","Heyn_aDMRs_neg","Alisch_aDMRs_neg","Reynolds_aDMRs_tcells_neg","Reynolds_aDMRs_monocytes_neg","deMagalhaes_genes_neg","deMagalhaes_genes_pos","Heyn_aDMRs_pos","Hannum_genes_predictive_neg","Hannum_genes_predictive_pos","Reynolds_aDMRs_tcells_pos","Alisch_aDMRs_pos")
 SideColors <- c("white", rep("red", 4), rep("green", 9))
 names(SideColors) <- marks_sets
-h <- heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="Regulatory similarity clustering", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks, ColSideColors=SideColors[colnames(as.matrix(mtx.cor[[1]]))])
+h <- heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method="euclidean")}, hclustfun=function(x){hclust(x, method="average")}, cexRow=1, cexCol=1,  main="", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks, ColSideColors=SideColors[colnames(as.matrix(mtx.cor[[1]]))])
 print("Distribution of correlation coefficients")
 (summary(mtx.cor[[1]][upper.tri(mtx.cor[[1]])]))
 print("Distribution of p-values")
@@ -293,7 +354,7 @@ Regulatory differences among the clusters (Differential enrichment analysis)
 
 The heatmap object contains information about the order of the clustering. We visualized this information as a dendrogram, cut into separate clusters.
 
-```{r defineClusters2, echo=FALSE, dependson="posnegHeat"}
+```{r defineClusters2, echo=FALSE}
 par(oma=c(0, 0, 0, 0), mar=c(5.1, 4.1, 4.1,25.1), cex=0.5)
 # Plot the dendrogram only, limit y axis. attr(h$colDendrogram, "height") has the maximum height of the dendrogram.
 plot(h$colDendrogram, horiz=T) 
@@ -406,9 +467,12 @@ pander(degs.matrix)
 ```
 
 
-Regulatory similarity among datasets using all cell lines
+Epigenomic similarity among sets of aDMRs and aGENs.
 ===
-```{r fig.height=6}
+
+aDMRs-and aGENs epigenomic enrichment profiles obtained from all epigenomic data (see Methods) were correlated with each other using Spearman correlation coefficient. The resulting correlation matrix was culstered using Euclidean/average clustering metrics, and visualized with darker blue/red gradient representing weaker/stronger epigenomic similarity, respectively. Each cell shows numerical value of the corresponding Spearman correlation coefficient.
+
+```{r suppl_fig_S1-admrs-agens_episimilarity, fig.height=6, dev=dev.out}
 mtx1 <- mtx.subset("../GenomeRunner/ALL//all_encBroadHmm.txt", factor=gfs_all, cell="")
 mtx2 <- mtx.subset("../GenomeRunner/ALL//all_encHistone.txt", factor=gfs_all, cell="")
 mtx3 <- mtx.subset("../GenomeRunner/ALL//all_encTfbs.txt", factor=gfs_all, cell="")
@@ -421,66 +485,11 @@ par(oma=c(10,0,0,10), mar=c(10, 4.1, 4.1, 10), cex.main=0.65) # Adjust margins
 my.breaks <- seq(min(mtx.cor[[1]][mtx.cor[[1]]!=min(mtx.cor[[1]])]),
                  max(mtx.cor[[1]][mtx.cor[[1]]!=max(mtx.cor[[1]])]),
                  length.out=(2*granularity + 1))
-h<-heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="Regulatory similarity clustering", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks)
+h<-heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks)
 print("Distribution of correlation coefficients")
 (summary(mtx.cor[[1]][upper.tri(mtx.cor[[1]])]))
 print("Distribution of p-values")
 summary(mtx.cor[[3]][upper.tri(mtx.cor[[3]])])
 ```
 
-Cell line similarity
-===
-```{r eval=F}
-# RUN ONCE, time consuming. This will create the matrix for cell-cell regulatory correlations
-# For each matrix, collect the list of heatmap carpets and merge them
-h1.list <- list() # BroadHmm
-for (i in 1:33) {
-  print(i)
-  h1.list <- c(h1.list, list(
-    showHeatmap("../GenomeRunner/ALL/all_encBroadHmm.txt", colnum=i, factor="name", cell="none", isLog10=TRUE, adjust="none", pval=1, numtofilt=1, toPlot="heat")))  
-}
-h1.df = Reduce(function(...) merge(..., all=T), h1.list)
-
-h2.list <- list() # Histone
-for (i in seq(1:33)) {
-  print(i)
-  h2.list <- c(h2.list, list(
-    data.frame(showHeatmap("../GenomeRunner/ALL/all_encHistone.txt", colnum=i, factor="none", cell="none", isLog10=TRUE, adjust="none", pval=1, numtofilt=10, toPlot="heat"))))
-}
-h2.df = Reduce(function(...) merge(..., all=T), h2.list)
-
-h3.list <- list() # Tfbs
-for (i in seq(1:33)[-29]) {
-  print(i)
-  h3.list <- c(h3.list, list(
-    showHeatmap("../GenomeRunner/ALL/all_encTfbs.txt", colnum=i, factor="none", cell="none", isLog10=TRUE, adjust="none", pval=1, numtofilt=10, toPlot="heat")))
-}
-h3.df = Reduce(function(...) merge(..., all=T), h3.list)
-
-Reduce(function(...) intersect(...), list(colnames(h1.df), colnames(h2.df), colnames(h3.df))) # How all 3 lists overlap, what are the common cell lines
-
-intersect(colnames(h1.df), colnames(h2.df)) # What are the common cell lines between BroadHmm and Histone datasets
-# Combine matrix
-mtx <- rbind(h1.df[, intersect(colnames(h1.df), colnames(h2.df))],
-             h2.df[, intersect(colnames(h1.df), colnames(h2.df))])
-# Save the combined matrix
-write.table(mtx, "../GenomeRunner/ALL/cell_BroadHmm_Histone.txt", sep="\t", quote=F, col.names=NA)
-```
-
-```{r fig.height=5}
-mtx <- read.table("../GenomeRunner/ALL/cell_BroadHmm_Histone.txt", sep="\t", header=T, row.names=1, stringsAsFactors=F)
-mtx.cor<-rcorr(as.matrix(mtx), type=correl)
-# Setting breaks to go from minimum to maximum correlation coefficients,
-# excluding min/max outliers. This way we get rid of diagonale of 1's
-my.breaks <- seq(min(mtx.cor[[1]][mtx.cor[[1]]!=min(mtx.cor[[1]])]),
-                 max(mtx.cor[[1]][mtx.cor[[1]]!=max(mtx.cor[[1]])]),
-                 length.out=(2*granularity + 1))
-hclust.method <- "single"
-h<-heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="Regulatory similarity clustering", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks)
-print("Distribution of correlation coefficients")
-diag(mtx.cor[[1]]) <- 0 # Eliminate self correlations
-(summary(mtx.cor[[1]][upper.tri(mtx.cor[[1]])]))
-print("Distribution of p-values")
-summary(mtx.cor[[3]][upper.tri(mtx.cor[[3]])])
-```
 

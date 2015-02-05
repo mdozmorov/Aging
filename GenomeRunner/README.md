@@ -1,52 +1,7 @@
-Enrichment analysis results
+The data and the results of GenomeRunner analyses
 ===
-Hannum
-------
-- `09-20-2014_11.09.10AM_meQTL_vs_TFBS161` - meQTLs vs. **161 TFBSs**
-- `09-21-2014_08.56.45AM_meQTL50bp_vs_TFBS161` - meQTLs flanked /-50bp vs. **161 TFBSs**, using flanked background
-- `09-21-2014_05.34.43PM_meQTL50bp_vs_ENCODEmean3` - meQTL flanked /-50bp vs. all ENCODE, mean threshold, 3 runs
-- `09-21-2014_10.43.49AM_meQTL_vs_Misc` - vs. evoCpg, evoFold, cosmic, gad, cpgIslandExt, vistaEnhancers, genomicSuperDups, microsat, rmsk, simpleRepeat, darned, consIndelsHgMmCanFam, phastBiasTracts3, phastConsElements100way, phastConsElements46way, phastConsElements46wayPlacental, phastConsElements46wayPrimates
-- `09-21-2014_08.57.04AM_meQTL_vs_DGV` - vs. individual DGVs (Deletions, Gain/Loss, CNVs etc.)
-- `09-21-2014_09.14.57AM_meQTL_vs_nestedRepeats` - vs. individual nested repeats (LINE, SINE etc.)
-- `09-21-2014_04.42.27PM_meQTL_vs_coriellDelDup` - vs. coriellDelDup (cell type-specific)
 
-Tissue-specific aDMR - age-related differentially methylated regions modeled in different tissues (mmc3).
-- [Tissue-specific aDMRs vs. chromatin states](http://genomerunner.org/result?id=khc6j46oojtys5rnq4u14cnhs3bvxsfn), saved in GR_mmc3_vs_chromStates.tar.gz
-- [Tissue-specific aDMRs vs. Gm12878 histoneMarks](http://genomerunner.org/result?id=e5ocsbs9ue7fdrjxxnco6y26febe5kfd), saved in GR_mmc3_vs_histoneMarks.tar.gz
-- [Tissue-specific aDMRs vs. genes](http://genomerunner.org/result?id=kdr4lz5iaaqn7lwturdflyryf0hepsie), saved in GR_mmc3_vs_genes.tar.gz
-- [Tissue-specific aDMRs vs. H3K4me3](http://genomerunner.org/result?id=lwnuddp7rg03if2nq2087uyupe8qsry8), saved in GR_mmc3_vs_H3K4me3.tar.gz
-- [Tissue-specific aDMRs vs. TFBS161](http://genomerunner.org/result?id=4ua0eqss17qevd1dup5l7z6ca1rnspmn), saved in GR_mmc3_vs_TFBS161.tar.gz
-- [Tissue-specific aDMRs vs. ENCODE](http://genomerunner.org/result?id=i41j4lt6wcqmpyhl02ttpy2ddi5yljnc), 25% cutoff, saved in GR_mmc3_vs_ENCODE.tar.gz
+- `Makefile` - counts cell types showing most frequent and most significant enrichment of the epigenomic datasets in aDMRs and aGENs.
 
-**Non-significant:**
+- `Makefile.all` - combines all enrichment matrixes into one.
 
-Tissue-specific aDMRs vs. repeats, coriellCNVs, ncRNAs, gapLocations
-
-Hannum_genes
-------------
-- `09-20-2014_10.12.50PM_TFBS161` - all genes vs. 161 TFBSs
-- `09-20-2014_10.21.18PM_s6_vs_ENCODEmean3` - all expression-age genes (mmc4) vs. all ENCODE, mean threshold, 3 runs
-- `09-20-2014_10.31.11PM_s7_vs_ENCODEmean3` - all expression-methylation-age genes (mmc5) vs. all ENCODE, mean threshold, 3 runs
-- `09-21-2014_02.49.19PM_Misc` - all genes vs. evoCpg, evoFold, cosmic, gad, cpgIslandExt, vistaEnhancers, genomicSuperDups, microsat, rmsk, simpleRepeat, darned, consIndelsHgMmCanFam, phastBiasTracts3, phastConsElements100way, phastConsElements46way, phastConsElements46wayPlacental, phastConsElements46wayPrimates
-- `09-21-2014_01.59.34PM_DGV` - all genes vs. individual types of DGV (Gain, Loss, Duplication, CNVs etc.)
-- `09-21-2014_05.32.16PM_nestedRepeats` - all genes vs. individual nested repeats (LINE, SINE etc.)
-- `09-21-2014_06.02.25PM_coriellDelDup` - all genes vs. coriellDelDup (cell type-specific)
-
-Alisch (all flanked)
------------------------------------
-- `09-22-2014_07.48.57PM_all50bp_vs_ENCODEmean3` - all vs. all ENCODE, mean threshold, 3 runs
-- `09-22-2014_07.49.45PM_pos-neg50bp_vs_ENCODEmean3` - pos and neg vs. all ENCODE, mean threshold, 3 runs
-- `10-04-2014_02.53.38PM_TFBS161_3` - all/pos/neg vs. 161 TFBSs, 3 runs
-- `10-04-2014_03.06.55PM_Misc_3` - all/pos/neg vs. evoCpg, evoFold, cosmic, gad, cpgIslandExt, vistaEnhancers, genomicSuperDups, microsat, rmsk, simpleRepeat, darned, consIndelsHgMmCanFam, phastBiasTracts3, phastConsElements100way, phastConsElements46way, phastConsElements46wayPlacental, phastConsElements46wayPrimates, 3 runs
-- `10-04-2014_03.10.13PM_DGV_3` - all/pos/neg vs. individual DGVs (Deletions, Gain/Loss, CNVs etc.)
-- `10-04-2014_03.15.10PM_nestedRepeats_3` - all/pos/neg vs. individual nested repeats (LINE, SINE etc.)
-- `10-04-2014_03.17.22PM_coriellDelDup_3` - all/pos/neg vs. coriellDelDup (cell type-specific)
-
-Rakyan (all flanked)
------------------------------------
-- `10-04-2014_06.53.25PM_ENCODEmean3` - vs. all ENCODE, mean threshold, 3 runs
-- `10-04-2014_03.58.31PM_TFBS161_3` - vs. 161 TFBSs, 3 runs
-- `10-04-2014_03.57.57PM_Misc_3` - vs. evoCpg, evoFold, cosmic, gad, cpgIslandExt, vistaEnhancers, genomicSuperDups, microsat, rmsk, simpleRepeat, darned, consIndelsHgMmCanFam, phastBiasTracts3, phastConsElements100way, phastConsElements46way, phastConsElements46wayPlacental, phastConsElements46wayPrimates, 3 runs
-- `10-04-2014_03.54.38PM_DGV_3` - vs. individual DGVs (Deletions, Gain/Loss, CNVs etc.)
-- `10-04-2014_03.54.08PM_nestedRepeats_3` - vs. individual nested repeats (LINE, SINE etc.)
-- `10-04-2014_03.53.27PM_coriellDelDup_3` - vs. coriellDelDup (cell type-specific)

@@ -7,7 +7,7 @@ output: html_document
 ```{r setup, echo=FALSE, include=FALSE, cache=FALSE}
 # Set up the environment
 library(knitr) 
-opts_chunk$set(cache.path='cache/', fig.path='img/', cache=F, tidy=T, fig.keep='high', dpi=300,  echo=F, autodep=T, width=200, warning=FALSE, comment=NA)
+opts_chunk$set(cache.path='cache/', fig.path='img/', cache=F, tidy=T, fig.keep='high', dpi=1000,  echo=F, autodep=T, width=200, warning=FALSE, comment=NA)
 options(replace.assign=TRUE, width=500)
 tidy.opts=list(width.cutoff=200)
 suppressMessages(library(pander))
@@ -126,10 +126,11 @@ par(oma=c(10,0,0,12), mar=c(10, 4.1, 4.1, 10), cex.main=0.65) # Adjust margins
 my.breaks <- seq(min(mtx.cor[[1]][mtx.cor[[1]]!=min(mtx.cor[[1]])]),
                  max(mtx.cor[[1]][mtx.cor[[1]]!=max(mtx.cor[[1]])]),
                  length.out=(2*granularity + 1))
+# Color bar settings
 marks_sets <- c("deMagalhaes_genes_all", "Heyn_aDMRs", "Reynolds_aDMRs_monocytes", "Alisch_aDMRs_all", "Steegenga_aDMRs_meta", "Hannum_aDMRs_primary", "Hannum_aDMRs_all", "Hannum_genes_predictive", "genes_LongevityMap", "Hannum_genes_associated", "Reynolds_aDMRs_tcells", "Rakyan_aDMRs_all", "Steegenga_aDMRs_and_gene", "Steegenga_aDMRs_not_gene")
-SideColors <- c("white", rep("red", 4), rep("green", 9))
+SideColors <- c(rep("red", 5), rep("green", 9))
 names(SideColors) <- marks_sets
-h <- heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.7, breaks=my.breaks, ColSideColors=SideColors[colnames(as.matrix(mtx.cor[[1]]))])
+h <- heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.6, breaks=my.breaks, ColSideColors=SideColors[colnames(as.matrix(mtx.cor[[1]]))])
 print("Distribution of correlation coefficients")
 diag(mtx.cor[[1]]) <- 0 # Eliminate self correlations
 (summary(mtx.cor[[1]][upper.tri(mtx.cor[[1]])]))
@@ -282,7 +283,7 @@ Darker blue/red gradient highlights depleted/enriched associations. Red/green ba
 
 A) Histone modification marks and modifiers
 ---
-```{r fig3a-enrichment_histone, fig.height=5.5, dev=dev.out}
+```{r fig3-enrichment_histone, fig.height=5.5, dev=dev.out}
 #dev.off()
 mtx.plot <- mtx.trim.numofsig(mtx.transform(mtx.sum_h), pval=0.1, numofsig=5)
 marks_h <- c("EZH2", "H3K4ME2", "H3K27ME3", "H2AZ", "H3K4ME1", "RBBP5", "CHD1", "HDAC2", "CHD7", "H3K4ME3", "H3K9AC", "PHF8", "HDAC6", "JMJD2A", "P300", "SUZ12", "PLU1", "SAP30", "H4K20ME1", "SIRT6", "CTCF", "JARID1A", "H3K27AC", "H3K79ME2", "H3K9ME3", "H3K36ME3", "CTCF", "H3K4ME2", "H3K9AC", "H4K20ME1", "JARID1A", "RBBP5", "SUZ12", "H3K4ME3", "HDAC2", "JMJD2A", "PHF8", "SAP30", "H3K9ME3", "H3K27AC", "H3K36ME3", "H3K79ME2")
@@ -295,7 +296,7 @@ heatmap.2(mtx.plot, distfun=function(x){dist(x,method=dist.method)}, hclustfun=f
 
 B) Transcription factor binding sites
 ---
-```{r fig3b-enrichment_tfbs, fig.height=5.5, dev=dev.out}
+```{r fig4-enrichment_tfbs, fig.height=5.5, dev=dev.out}
 #dev.off()
 mtx.plot <- mtx.trim.numofsig(mtx.transform(mtx.sum_t), pval=0.1, numofsig=9)
 marks_t <- c("SIN3A", "Znf143", "CtBP2", "Bach1", "Max", "Rad21", "RAD21", "TBP", "E2F6", "EZH2_(39875)", "Mxi1", "CHD1_(A301-218A)", "CHD2", "NRSF", "SUZ12", "CHD1", "CTCF_(SC-5916)", "GABP", "GTF2F1", "JunD", "SP1", "TEAD4", "YY1", "c-Myc", "CEBPB", "CTCF", "Pol2", "Pol2-4H8", "RBBP5_(A300-109A)", "RXRA", "Sin3Ak-20", "TAF1", "TAF7", "TCF12", "TEAD4_(SC-101184)", "Znf143_(16618-1-AP)", "BCL11A", "BRCA1", "c-Jun", "CREB1", "HDAC2", "HDAC2_(SC-6296)", "MafK", "MafK_(ab50322)", "Mxi1_(AF4185)", "NANOG", "Nrf1", "POU5F1", "USF2", "ZNF274", "ATF2_(SC-81188)", "c-Jun", "E2F6", "Max", "POU5F1", "Rad21", "RFX5", "SUZ12", "TEAD4", "Bach1", "CtBP2", "Egr-1", "p300", "SIN3A", "SRF", "USF2", "ATF3", "BRCA1_(A300-000A)", "CHD1", "GABP", "Mxi1", "SIN3A_(NB600-1263)", "Znf143", "BRCA1", "CHD2", "CHD2_(AB68301)", "GTF2F1", "GTF2F1_(AB28179)", "RBBP5_(A300-109A)", "SIX5", "TAF7_(SC-101167)", "TBP", "YY1", "YY1_(SC-281)", "c-Myc", "JunD", "SP2", "SP2_(SC-643)", "CREB1", "Nrf1", "Sin3Ak-20", "SP4_(V-20)", "ATF2", "SP4", "TAF1", "Pol2-4H8", "SP1", "TAF7", "JARID1A_(ab26049)", "Pol2")
@@ -307,7 +308,7 @@ heatmap.2(mtx.plot, distfun=function(x){dist(x,method=dist.method)}, hclustfun=f
 
 C) Chromatin states
 ---
-```{r fig3c-enrichment_chromstates, fig.height=5.5, dev=dev.out}
+```{r fig5-enrichment_chromstates, fig.height=5.5, dev=dev.out}
 #dev.off()
 mtx.plot <- mtx.trim.numofsig(mtx.transform(mtx.sum_c), pval=0.1, numofsig=2)
 marks_c <- c("3_Poised_Promoter", "2_Weak_Promoter", "6_Weak_Enhancer", "4_Strong_Enhancer", "7_Weak_Enhancer", "1_Active_Promoter", "12_Repressed", "5_Strong_Enhancer", "9_Txn_Transition", "13_Heterochrom/lo", "15_Repetitive/CNV", "8_Insulator", "12_Repressed", "14_Repetitive/CNV", "15_Repetitive/CNV", "2_Weak_Promoter", "6_Weak_Enhancer", "7_Weak_Enhancer", "9_Txn_Transition", "8_Insulator", "11_Weak_Txn", "1_Active_Promoter", "10_Txn_Elongation", "13_Heterochrom/lo")
@@ -327,7 +328,7 @@ Pos/Neg aDMRs-and aGENs epigenomic enrichment profiles obtained from H1hesc epig
 fn_degs <- "results/degs_posneg_embryo.txt" # Differential GFs among the clusters
 ```
 
-```{r fig4-pos-neg_episimilarity, fig.height=6, dev=dev.out}
+```{r fig6-pos-neg_episimilarity, fig.height=6, dev=dev.out}
 mtx1 <- mtx.subset("../GenomeRunner/ALL//all_encBroadHmm.txt", factor=gfs_posneg, cell=paste(cells, collapse="|"))
 mtx2 <- mtx.subset("../GenomeRunner/ALL//all_encHistone.txt", factor=gfs_posneg, cell=paste(cells, collapse="|"))
 mtx3 <- mtx.subset("../GenomeRunner/ALL//all_encTfbs.txt", factor=gfs_posneg, cell=paste(cells, collapse="|"))

@@ -1,0 +1,76 @@
+---
+title: "Processing age-tissue data"
+author: "Mikhail G. Dozmorov"
+date: "March 6, 2015"
+output: html_document
+---
+
+```{r}
+mtx.slpv <- read.table("../data/Cory.age.summary/slpv.matrix", sep="\t", row.names=1, header=TRUE, stringsAsFactors=FALSE, check.names=FALSE) # A matrix of tissue-specific p-values
+bto.annot <- read.table("../data/Cory.age.summary/bto-names_noquotes.txt.gz", sep="\t", row.names=1, header=TRUE, stringsAsFactors=FALSE, check.names=FALSE) # Names of BTO ontologies
+setdiff(colnames(mtx.slpv), row.names(bto.annot)) # Sanity check, should be none
+colnames(mtx.slpv) <- bto.annot[ colnames(mtx.slpv), ] # Reassign BTO IDs to text names
+```
+
+```{r}
+cutoff.pval <- 0.01 # Cutoff for selecting significant genes
+genes <- vector(mode="list", length=length(colnames(mtx.slpv))) # Vector to keep lists of genes
+for (i in 1:length(colnames(mtx.slpv))) {
+  ind <- abs(mtx.slpv[, i]) > -log10(cutoff.pval) & !is.nan(mtx.slpv[, i]) # Indexes of significant genes
+  genes[[i]] <- (rownames(mtx.slpv)[ind]) # Keep them
+}
+```
+
+```{r}
+library(biomaRt)
+# mart <- useMart("ensembl", dataset="hsapiens_gene_ensembl", host="www.biomart.org", verbose=TRUE)
+# Use Ensembl 75: Feb 2014 (GRCh37.p13)
+# listMarts(host="feb2014.archive.ensembl.org",path="/biomart/martservice",archive=FALSE)
+mart <- useMart("ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl", host="feb2014.archive.ensembl.org",path="/biomart/martservice",archive=FALSE, verbose=TRUE) # Last mart containing HG19 genome annotation
+
+upstream <- 2000 # Definition of the promoter - 2000bp upstream
+downstream <- 500 # and 500bp downstream
+
+for (i in 1:length(genes)) { # Go through each gene list
+  if (length(genes[[i]]) > 10) { # Process it, if it has more than 10 genes
+    print(paste("Processing", i, colnames(mtx.slpv)[i], sep=" "))
+    coords <- getBM(attributes=c('chromosome_name','start_position', 'end_position', 'strand','hgnc_symbol'), filters='entrezgene', values=genes[[i]], mart=mart, uniqueRows=T)
+  coords <- coords[ coords$chromosome_name %in% c(seq(1,22), "X"), ] # Keep only normal chromosomes
+  ind.pos <- coords$strand == 1 # Indexes of positive strand
+  ind.neg <- coords$strand == -1 # and negative strand
+  # Recalculate promoters depending on strand
+  coords$end_position[ ind.pos ] <- coords$start_position[ ind.pos ] + downstream
+  coords$start_position[ ind.pos ] <- coords$start_position[ ind.pos ] - upstream
+  coords$start_position[ ind.neg ] <- coords$end_position[ ind.neg ] - downstream
+  coords$end_position[ ind.neg ] <- coords$end_position[ ind.neg ] + upstream
+  # Make BED format
+  coords$strand[ ind.pos ] <- "+"
+  coords$strand[ ind.neg ] <- "-"
+  coords$chromosome_name <- paste("chr", coords$chromosome_name, sep="")
+  # Save the data
+  write.table(coords, paste("../data/Cory.age.summary/results/", colnames(mtx.slpv)[i], ".bed", sep=""), sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
+  } else {
+    print(paste("Skipping", i, colnames(mtx.slpv)[i], sep=" "))
+  }
+}
+
+# Separately process all genes, to be used as a background
+coords <- getBM(attributes=c('chromosome_name','start_position', 'end_position', 'strand','hgnc_symbol'), filters='entrezgene', values=rownames(mtx.slpv), mart=mart, uniqueRows=T)
+coords <- coords[ coords$chromosome_name %in% c(seq(1,22), "X"), ]
+ind.pos <- coords$strand == 1
+ind.neg <- coords$strand == -1
+coords$end_position[ ind.pos ] <- coords$start_position[ ind.pos ] + downstream
+coords$start_position[ ind.pos ] <- coords$start_position[ ind.pos ] - upstream
+coords$start_position[ ind.neg ] <- coords$end_position[ ind.neg ] - downstream
+coords$end_position[ ind.neg ] <- coords$end_position[ ind.neg ] + upstream
+coords$strand[ ind.pos ] <- "+"
+coords$strand[ ind.neg ] <- "-"
+coords$chromosome_name <- paste("chr", coords$chromosome_name, sep="")
+write.table(coords, "../data/Cory.age.summary/results/all_entrez.bed", sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
+
+# Post-process them in shell
+# for file in *.bed; do echo $file; sort -k1,1 -k2,2n <"$file" > tmp.bed && mv tmp.bed "$file"; done
+
+
+```
+

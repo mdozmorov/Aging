@@ -130,7 +130,7 @@ my.breaks <- seq(min(mtx.cor[[1]][mtx.cor[[1]]!=min(mtx.cor[[1]])]),
 marks_sets <- c("deMagalhaes_genes_all", "Heyn_aDMRs", "Reynolds_aDMRs_monocytes", "Alisch_aDMRs_all", "Steegenga_aDMRs_meta", "Hannum_aDMRs_primary", "Hannum_aDMRs_all", "Hannum_genes_predictive", "genes_LongevityMap", "Hannum_genes_associated", "Reynolds_aDMRs_tcells", "Rakyan_aDMRs_all", "Steegenga_aDMRs_and_gene", "Steegenga_aDMRs_not_gene")
 SideColors <- c(rep("red", 5), rep("green", 9))
 names(SideColors) <- marks_sets
-h <- heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.6, breaks=my.breaks, ColSideColors=SideColors[colnames(as.matrix(mtx.cor[[1]]))])
+h <- heatmap.2(as.matrix(mtx.cor[[1]]), trace="none", density.info="none", col=color, distfun=function(x){dist(x, method=dist.method)}, hclustfun=function(x){hclust(x, method=hclust.method)}, cexRow=1, cexCol=1,  main="", cellnote=formatC(as.matrix(mtx.cor[[1]]), format="f", digits=2), notecol="black", notecex=0.6, breaks=my.breaks)#, ColSideColors=SideColors[colnames(as.matrix(mtx.cor[[1]]))])
 print("Distribution of correlation coefficients")
 diag(mtx.cor[[1]]) <- 0 # Eliminate self correlations
 (summary(mtx.cor[[1]][upper.tri(mtx.cor[[1]])]))
@@ -286,7 +286,7 @@ A) Histone modification marks and modifiers
 ```{r fig3-enrichment_histone, fig.height=5.5, dev=dev.out}
 #dev.off()
 mtx.plot <- mtx.trim.numofsig(mtx.transform(mtx.sum_h), pval=0.1, numofsig=5)
-marks_h <- c("EZH2", "H3K4ME2", "H3K27ME3", "H2AZ", "H3K4ME1", "RBBP5", "CHD1", "HDAC2", "CHD7", "H3K4ME3", "H3K9AC", "PHF8", "HDAC6", "JMJD2A", "P300", "SUZ12", "PLU1", "SAP30", "H4K20ME1", "SIRT6", "CTCF", "JARID1A", "H3K27AC", "H3K79ME2", "H3K9ME3", "H3K36ME3", "CTCF", "H3K4ME2", "H3K9AC", "H4K20ME1", "JARID1A", "RBBP5", "SUZ12", "H3K4ME3", "HDAC2", "JMJD2A", "PHF8", "SAP30", "H3K9ME3", "H3K27AC", "H3K36ME3", "H3K79ME2")
+marks_h <- c("EZH2", "H3K4ME2", "H3K27ME3", "H2A.Z", "H3K4ME1", "RBBP5", "CHD1", "HDAC2", "CHD7", "H3K4ME3", "H3K9AC", "PHF8", "HDAC6", "JMJD2A", "P300", "SUZ12", "PLU1", "SAP30", "H4K20ME1", "SIRT6", "CTCF", "JARID1A", "H3K27AC", "H3K79ME2", "H3K9ME3", "H3K36ME3", "CTCF", "H3K4ME2", "H3K9AC", "H4K20ME1", "JARID1A", "RBBP5", "SUZ12", "H3K4ME3", "HDAC2", "JMJD2A", "PHF8", "SAP30", "H3K9ME3", "H3K27AC", "H3K36ME3", "H3K79ME2")
 SideColors <- as.vector(rev(green2red(length(marks_h))))
 names(SideColors) <- marks_h
 #RowSideColors <- RowSideColors[colnames(mtx.plot)]

@@ -1,0 +1,229 @@
+---
+title: "Extract hg19 genomic coordinates of the promoters (+2000..-500bp) of age-associated genes"
+# author: "Mikhail G. Dozmorov"
+# date: "March 13, 2016"
+output: html_document
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+# Set up the environment
+library(knitr)
+opts_chunk$set(cache.path='cache/', fig.path='img/', cache=F, tidy=T, fig.keep='high', echo=F, dpi=100, warnings=F, message=F, comment=NA, warning=F, results='as.is', eval = F) #out.width=700, 
+library(pander)
+panderOptions('table.split.table', Inf)
+set.seed(1)
+library(xlsx)
+library(dplyr)
+library(MDmisc)
+library(annotables)
+# Remove non-canonical chromosome names
+grch37 <- annotables::grch37[ !(grepl("_", annotables::grch37$chr) | grepl("GL", annotables::grch37$chr)), ]
+# Convert Entrez IDs to character vector
+grch37$entrez <- as.character(grch37$entrez)
+```
+
+Data description at [https://github.com/mdozmorov/Aging/tree/master/data](https://github.com/mdozmorov/Aging/tree/master/data) 
+
+# 1. deMagalhaes genes
+
+Genes positively and negatively associated with age
+
+```{r eval=TRUE}
+genes.deMagalhaes.over <- read.xlsx2("../data/deMagalhaes/supplementary_tables.xls", sheetName = "Genes_overexpressed", startRow = 15, colIndex = 1, header = TRUE, stringsAsFactors = FALSE)
+genes.deMagalhaes.under <- read.xlsx2("../data/deMagalhaes/supplementary_tables.xls", sheetName = "Genes_underexpressed", startRow = 10, colIndex = 1, header = TRUE, stringsAsFactors = FALSE)
+```
+
+Overlap between genes positively/negatively associated with age
+
+```{r eval=TRUE}
+genes.deMagalhaes.over <- left_join(genes.deMagalhaes.over, grch37[, c("entrez", "symbol")], by = c("EntrezGeneID" = "entrez"))
+genes.deMagalhaes.under <- left_join(genes.deMagalhaes.under, grch37[, c("entrez", "symbol")], by = c("EntrezGeneID" = "entrez"))
+
+venn <- Venn2(unique(genes.deMagalhaes.over$symbol), unique(genes.deMagalhaes.under$symbol), names = c("Over", "Under"), title = "deMagalhaes genes")
+print("Genes both positively and negatively associated with age: ")
+venn$id[venn$Over == 1 & venn$Under == 1]
+# All gene symbols associated with age
+genes.deMagalhaes.all <- c(genes.deMagalhaes.over$symbol, genes.deMagalhaes.under$symbol) %>% unique
+print(paste0("Total number of genes: ", length(genes.deMagalhaes.all)))
+```
+
+```{r}
+promoters.deMagalhaes.over <- gr_promoter_extract(selected = unique(genes.deMagalhaes.over$EntrezGeneID), id = "entrezid", upstream = 2000, downstream = 500)
+write.table(promoters.deMagalhaes.over$promoters, "../data/deMagalhaes/genes_deMagalhaes_over.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+print(paste0("Promoters extracted for ", nrow(promoters.deMagalhaes.over$promoters), " overexpressed genes. ", length(promoters.deMagalhaes.over$notfound), " genes not found."))
+
+promoters.deMagalhaes.under <- gr_promoter_extract(selected = unique(genes.deMagalhaes.under$EntrezGeneID), id = "entrezid", upstream = 2000, downstream = 500)
+write.table(promoters.deMagalhaes.under$promoters, "../data/deMagalhaes/genes_deMagalhaes_under.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+print(paste0("Promoters extracted for ", nrow(promoters.deMagalhaes.under$promoters), " underexpressed genes. ", length(promoters.deMagalhaes.under$notfound), " genes not found."))
+```
+
+# 2. GenAge genes
+
+Non-directional set of genes associated with age
+
+```{r eval=TRUE}
+genes.genage <- read.csv("../data/genes/GenAge/genage_human.csv", stringsAsFactors = FALSE, colClasses = "character")
+genes.genage <- left_join(genes.genage[, c("entrez.gene.id"), drop = F], grch37[, c("entrez", "symbol")], by = c("entrez.gene.id" = "entrez"))
+# All gene symbols associated with age
+genes.genage.all <- unique(genes.genage$symbol)
+print(paste0("Total number of genes: ", length(genes.genage.all)))
+```
+
+```{r}
+promoters.genage <- gr_promoter_extract(selected = unique(genes.genage$entrez.gene.id), id = "entrezid", upstream = 2000, downstream = 500)
+write.table(promoters.genage$promoters, "../data/genes/GenAge/genes_GenAge.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+print(paste0("Promoters extracted for ", nrow(promoters.genage$promoters), " genes. ", length(promoters.genage$notfound), " genes not found."))
+```
+
+# 3. LongevityMap genes
+
+Non-directional set of genes associated with age, different populations. Population is ignored.
+
+```{r eval=TRUE}
+genes.longevitymap <- read.csv("../data/genes/LongevityMap/longevity.csv", stringsAsFactors = FALSE)
+genes.longevitymap <- genes.longevitymap[ genes.longevitymap$Association == "Significant" & genes.longevitymap$Gene.s. != "", ] # Keep 253 significant non-empty genes.longevitymap
+# Unembed some comma-separated gene symbols
+genes.longevitymap <- unembed(genes.longevitymap[, c("Population", "Gene.s.")], col = "Gene.s.", sep = ", ")
+# All gene symbols associated with age
+genes.longevitymap.all <- unique(genes.longevitymap$Gene.s.)
+print(paste0("Total number of genes: ", length(genes.longevitymap.all)))
+```
+
+```{r}
+promoters.longevitymap <- gr_promoter_extract(selected = genes.longevitymap.all, id = "symbol", upstream = 2000, downstream = 500)
+write.table(promoters.longevitymap$promoters, "../data/genes/LongevityMap/genes_LongevityMap.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+print(paste0("Promoters extracted for ", nrow(promoters.longevitymap$promoters), " genes. ", length(promoters.longevitymap$notfound), " genes not found."))
+```
+
+# 4. JenAge
+
+Non-directional set of genes associated with age
+
+```{r eval=TRUE}
+genes.jenage <- read.table("../data/genes/JenAge/gene.tsv.gz", sep="\t", stringsAsFactors = FALSE, fill = T, quote = "\"", header = T, comment.char = "")
+# table(genes.jenage$Ageing.Relevance..Ageing.Factor.) # Evidence code: 'no', 'putative', and 'yes'
+# table(genes.jenage$Name..Species.) # Organisms: use 'Homo sapiens'
+# table(genes.jenage$Source.Name..Source...Ageing.Relevance.Analysis.) # Database source: majority are from 'AgeFactDB Homology Analysis'
+genes.jenage <- genes.jenage[ genes.jenage$Name..Species. == "Homo sapiens" & genes.jenage$Ageing.Relevance..Ageing.Factor. != "no", ] # Subset data, 862 genes left
+# All gene symbols associated with age
+genes.jenage.all <- unique(genes.jenage$Gene.Symbol)
+print(paste0("Total number of genes: ", length(genes.jenage.all)))
+```
+
+```{r}
+promoters.jenage <- gr_promoter_extract(selected = genes.jenage.all, id = "symbol", upstream = 2000, downstream = 500)
+write.table(promoters.jenage$promoters, "../data/genes/JenAge/genes_jenage.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+print(paste0("Promoters extracted for ", nrow(promoters.jenage$promoters), " genes. ", length(promoters.jenage$notfound), " genes not found."))
+```
+
+# 5. Hannum
+
+- `genes.hannum_corr` - 326 genes correlated with age by expression, whole blood. Non-directional.
+
+```{r eval=TRUE}
+genes.hannum_corr <- read.xlsx2("../data/Hannum/mmc4.xlsx", sheetName = "suppTable6", header = FALSE, stringsAsFactors = FALSE)
+# All gene symbols associated with age
+genes.hannum_corr.all <- unique(genes.hannum_corr$X1)
+print(paste0("Total number of genes: ", length(genes.hannum_corr.all)))
+```
+
+```{r}
+promoters.hannum_corr <- gr_promoter_extract(selected = genes.hannum_corr.all, id = "symbol", upstream = 2000, downstream = 500)
+write.table(promoters.hannum_corr$promoters, "../data/Hannum/genes_hannum_corr.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+print(paste0("Promoters extracted for ", nrow(promoters.hannum_corr$promoters), " genes. ", length(promoters.hannum_corr$notfound), " genes not found."))
+```
+
+- `genes.hannum_pred` - 54 genes predictive of age based by their expression, whole blood, data not related to methylation data. 24 of these genes showed positive correlation with age by expression, 30 were found to be negatively correlated with age.
+
+```{r eval=TRUE}
+genes.hannum_pred <- read.xlsx2("../data/Hannum/mmc5.xlsx", sheetName = "suppTable7", header = TRUE, stringsAsFactors = FALSE)
+genes.hannum_pred_over <- unique(genes.hannum_pred$Gene[ genes.hannum_pred$Coefficient > 0 ])
+genes.hannum_pred_under <- unique(genes.hannum_pred$Gene[ genes.hannum_pred$Coefficient <= 0 ])
+venn <- Venn2(genes.hannum_pred_over, genes.hannum_pred_under, names = c("Over", "Under"))
+# All gene symbols associated with age
+genes.hannum_pred.all <- unique(genes.hannum_pred$Gene)
+print(paste0("Total number of genes: ", length(genes.hannum_pred.all)))
+```
+
+```{r}
+promoters.hannum_pred.over <- gr_promoter_extract(selected = genes.hannum_pred_over, id = "symbol", upstream = 2000, downstream = 500)
+write.table(promoters.hannum_pred.over$promoters, "../data/Hannum/genes_hannum_pred_over.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+print(paste0("Promoters extracted for ", nrow(promoters.hannum_pred.over$promoters), " overexpressed genes. ", length(promoters.hannum_pred.over$notfound), " genes not found."))
+
+promoters.hannum_pred.under <- gr_promoter_extract(selected = genes.hannum_pred_under, id = "symbol", upstream = 2000, downstream = 500)
+write.table(promoters.hannum_pred.under$promoters, "../data/Hannum/genes_hannum_pred_under.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+print(paste0("Promoters extracted for ", nrow(promoters.hannum_pred.under$promoters), " underexpressed genes. ", length(promoters.hannum_pred.under$notfound), " genes not found."))
+```
+
+# Overlap among five gene sets
+
+```{r eval=TRUE}
+Venn5(genes.deMagalhaes.all, genes.genage.all, genes.longevitymap.all, genes.jenage.all, genes.hannum_corr.all)
+```
+
+# 6. Peters
+
+Directional age-associated genes, whole blood
+
+```{r eval=TRUE}
+genes.peters <- read.xlsx2("../data/Peters/ncomms9570-s2.xlsx", sheetName = "Data.1", startRow = 3, header = TRUE, stringsAsFactors = FALSE)
+genes.peters <- genes.peters[ genes.peters$RANK != "n", ] # Keep 1497 genes
+genes.peters_over <- unique(genes.peters$NEW.Entrez.ID[ genes.peters$META.Direction == "+" ]) # 600 positively correlating
+genes.peters_under <- unique(genes.peters$NEW.Entrez.ID[ genes.peters$META.Direction == "-" ]) # 897 negatively correlating
+venn <- Venn2(genes.peters_over, genes.peters_under, c("Over", "Under"))
+# All gene symbols associated with age
+genes.peters.all <- grch37$symbol[ grch37$entrez %in% c(genes.peters_over, genes.peters_under) ] %>% unique
+print(paste0("Total number of genes: ", length(genes.peters.all)))
+```
+
+```{r}
+promoters.peters.over <- gr_promoter_extract(selected = genes.peters_over, id = "entrez", upstream = 2000, downstream = 500)
+write.table(promoters.peters.over$promoters, "../data/Peters/genes_peters_over.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+print(paste0("Promoters extracted for ", nrow(promoters.peters.over$promoters), " overexpressed genes. ", length(promoters.peters.over$notfound), " genes not found."))
+
+promoters.peters.under <- gr_promoter_extract(selected = genes.peters_under, id = "entrez", upstream = 2000, downstream = 500)
+write.table(promoters.peters.under$promoters, "../data/Peters/genes_peters_under.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+print(paste0("Promoters extracted for ", nrow(promoters.peters.under$promoters), " underexpressed genes. ", length(promoters.peters.under$notfound), " genes not found."))
+```
+
+# 7. AGE atlas
+
+```{r eval=TRUE}
+genes.ageatlas <- read.csv("../data/Cory.age.summary/AGE Atlas gender effects, part 2.csv", stringsAsFactors = FALSE)
+genes.ageatlas <- genes.ageatlas[ genes.ageatlas$p < 0.001, ] # Create subset of supposedly highly significant genes
+# summary(genes.ageatlas$coef[ genes.ageatlas$coef < 0 ])
+# summary(genes.ageatlas$coef[ genes.ageatlas$coef > 0 ])
+genes.ageatlas_over <- genes.ageatlas$Entrez.Gene.ID[ genes.ageatlas$coef > 0 ] %>% unique
+genes.ageatlas_under <- genes.ageatlas$Entrez.Gene.ID[ genes.ageatlas$coef < 0 ] %>% unique
+```
+
+```{r}
+promoters.ageatlas.over <- gr_promoter_extract(selected = genes.ageatlas_over, id = "entrez", upstream = 2000, downstream = 500)
+write.table(promoters.ageatlas.over$promoters, "../data/Cory.age.summary/genes_ageatlas_over.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+print(paste0("Promoters extracted for ", nrow(promoters.ageatlas.over$promoters), " overexpressed genes. ", length(promoters.ageatlas.over$notfound), " genes not found."))
+
+promoters.ageatlas.under <- gr_promoter_extract(selected = genes.ageatlas_under, id = "entrez", upstream = 2000, downstream = 500)
+write.table(promoters.ageatlas.under$promoters, "../data/Cory.age.summary/genes_ageatlas_under.bed", sep = "\t", col.names = F, row.names = F, quote = F)
+print(paste0("Promoters extracted for ", nrow(promoters.ageatlas.under$promoters), " underexpressed genes. ", length(promoters.ageatlas.under$notfound), " genes not found."))
+```
+
+Overlap between directional Peters and AGE atlas genes, vs. all others
+
+```{r eval=TRUE}
+genes.12345 <- unique(c(unique(genes.deMagalhaes.over$EntrezGeneID), unique(genes.deMagalhaes.under$EntrezGeneID), unique(genes.genage$entrez.gene.id), unique(grch37$entrez[ grch37$symbol %in% genes.longevitymap.all]), unique(grch37$entrez[ grch37$symbol %in% genes.jenage.all]), unique(grch37$entrez[ grch37$symbol %in% genes.hannum_corr.all])))
+
+Venn5(genes.peters_over, genes.peters_under, genes.ageatlas_over, genes.ageatlas_under, genes.12345)
+```
+
+
+# Session_info
+
+```{r session_info, eval=TRUE}
+diagnostics <- devtools::session_info()
+platform <- data.frame(diagnostics$platform %>% unlist, stringsAsFactors = FALSE)
+colnames(platform) <- c("description")
+pander(platform)
+
+packages <- as.data.frame(diagnostics$packages)
+pander(packages[ packages$`*` == "*", ])
+```

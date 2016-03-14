@@ -10,11 +10,40 @@ Illumina 450K
 - [Alisch_et_al_Sup_Table2.*](http://genome.cshlp.org/content/suppl/2012/02/01/gr.125187.111.DC1/Alisch_et_al_Sup_Table2.xls) - 2,078 regions correlated with age by methylation in peripheral blood; 479 of them showed positive correlation with age by methylation, 1,599 were found to be negatively correlated with age ("SSC.age.cor", 13th column). 
 
 
+### `Cory.age.summary`
+
+- `AGE Atlas gender effects, part 2.csv` - Data from [AGE Atlas: gender effects, part 2](http://blog.corygil.es/age-atlas/gender-effects-part-2.html)
+
+
 ### `deMagalhaes`
 
 De Magalhães, J. P., et.al. ["Meta-analysis of age-related gene expression profiles identifies common signatures of aging"](http://bioinformatics.oxfordjournals.org/content/25/7/875.short)
 
-- [signatures_supplement.zip](http://genomics.senescence.info/gene_expression/signatures_supplement.zip) A Conserved Gene Expression Signature of Mammalian Aging on [Human Ageing Genomic Resources](http://genomics.senescence.info/gene_expression/signatures.html) - 73 age-associated genes. 56 genes overexpressed with age; 17 genes underexpressed with age.
+- [signatures_supplement.zip](http://genomics.senescence.info/gene_expression/signatures_supplement.zip) A Conserved Gene Expression Signature of Mammalian Aging on [Human Ageing Genomic Resources](http://genomics.senescence.info/gene_expression/signatures.html).
+
+	- `supplementary_material.pdf` - description of the supplementary tables
+	- `supplementary_tables*` - tables S3 and S4 contain 232 overespressed/146 underexpressed with age genes, consensus across all tissues. EntrezIDs and gene symbols, mixture of human and mouse IDs.
+	- `genes_deMagalhaes_over/under.txt/bed` - gene symbols of 232 overespressed/146 underexpressed with age genes. BED files contain promoters (+2000..-500bp) of these genes, extracted with `R.Aging/genes_promoters_extract.Rmd`
+
+
+### `genes/GenAge`
+
+Data from [Human Ageing Genomic Resources](http://genomics.senescence.info/download.html)
+
+- `[human_genes.zip](http://genomics.senescence.info/genes/human_genes.zip)` and `genage_human.csv` - 305 genes associated with age. Non-directional
+- `genes_GenAge.bed` - promoters (+2000..-500bp) of these genes, extracted with `R.Aging/genes_promoters_extract.Rmd`
+
+
+### `genes/JenAge
+
+Data from [JenAge/AgeFactDB](http://agefactdb.jenage.de/cgi-bin/jaDB.cgi?VIEW=download). Use 'Ageing Factor Type': 'gene', 'Ageing Relevance Evidence': 'Any', 'File Type': 'TSV'
+
+
+### `genes/LongevityMap`
+
+Data from [Human Ageing Genomic Resources](http://genomics.senescence.info/download.html)
+
+- `[longevity_genes.zip](http://genomics.senescence.info/longevity/longevity_genes.zip)` and `longevity.csv` - population-specific genes and rsids associated with longevity. 
 
 
 ### `Hannum`
@@ -34,11 +63,11 @@ Illumina 450K
 
 [Table S6. Genes Associated with Aging in Both the Methylome and the Transcriptome, Related to Figure 7.](http://www.sciencedirect.com/science/MiamiMultiMediaURL/1-s2.0-S1097276512008933/1-s2.0-S1097276512008933-mmc4.xlsx/272198/FULL/S1097276512008933/60c29e9569bef2044ecead91da601f47/mmc4.xlsx) - A list of genes that mapped to age-associated methylation markers and showed age-associated changes the transcriptome.
 
-- `mmc4_Genes_S6.*` - 326 genes correlated with age by expression, whole blood, data not related to methylation data 
+- `mmc4_Genes_S6.*` - 326 genes correlated with age by expression, whole blood, data not related to methylation data. From [Table S6. Genes Associated with Aging in Both the Methylome and the Transcriptome, Related to Figure 7.](http://www.sciencedirect.com/science/MiamiMultiMediaURL/1-s2.0-S1097276512008933/1-s2.0-S1097276512008933-mmc4.xlsx/272198/html/S1097276512008933/a609fb76dfb564b4e3f57887c2df17dc/mmc4.xlsx)
 
 [Table S7. Transcriptome Aging Model, Related to Figure 7.](http://www.sciencedirect.com/science/MiamiMultiMediaURL/1-s2.0-S1097276512008933/1-s2.0-S1097276512008933-mmc5.xlsx/272198/FULL/S1097276512008933/bdeaadf32df47e709bf1e98e9f7405e2/mmc5.xlsx)
 
- - `mmc5_Genes_all/neg/pos_S7.*` - 55 genes predictive of age based by their expression, whole blood, data not related to methylation data. 24 of these genes showed positive correlation with age by expression, 31 were found to be negatively correlated with age
+ - `mmc5_Genes_all/neg/pos_S7.*` - 55 genes predictive of age based by their expression, whole blood, data not related to methylation data. 24 of these genes showed positive correlation with age by expression, 31 were found to be negatively correlated with age. From [Table S7. Transcriptome Aging Model, Related to Figure 7.](http://www.sciencedirect.com/science/MiamiMultiMediaURL/1-s2.0-S1097276512008933/1-s2.0-S1097276512008933-mmc5.xlsx/272198/html/S1097276512008933/a0cf53be370e97f7d3fabcb80fdb74ec/mmc5.xlsx)
 
 
 ### `Heyn`

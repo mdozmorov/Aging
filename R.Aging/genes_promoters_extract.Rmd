@@ -36,13 +36,13 @@ Data description at [https://github.com/mdozmorov/Aging/tree/master/data](https:
 
 We are analyzing promoters of the following gene sets (BED files with coordinates of -2000..500bp around TSSs):
 
-- `deMagalhaes_over/under.bed`
+- `deMagalhaes_pos/neg.bed`
 - `GenAge.bed`
 - `LongevityMap.bed`
 - `JenAge.bed`
-- `Hannum_corr.bed` and `Hannum_pred_over/under.bed`
-- `Peters_over/under.bed`
-- `AgeAtlas_over/under.bed`
+- `Hannum_corr.bed` and `Hannum_pred_pos/neg.bed`
+- `Peters_pos/neg.bed`
+- `AgeAtlas_pos/neg.bed`
 
 # 1. deMagalhaes genes
 
@@ -68,11 +68,11 @@ print(paste0("Total number of genes: ", length(genes.deMagalhaes.all)))
 ```
 
 ```{r}
-fileName <- "../data/deMagalhaes/deMagalhaes_over.bed"
+fileName <- "../data/deMagalhaes/deMagalhaes_pos.bed"
 promoters <- gr_promoter_extract(selected = unique(genes.deMagalhaes.over$EntrezGeneID), id = "entrezid", upstream = 2000, downstream = 500)
 save.promoters(fileName, promoters)
 
-fileName <- "../data/deMagalhaes/deMagalhaes_under.bed"
+fileName <- "../data/deMagalhaes/deMagalhaes_neg.bed"
 promoters <- gr_promoter_extract(selected = unique(genes.deMagalhaes.under$EntrezGeneID), id = "entrezid", upstream = 2000, downstream = 500)
 save.promoters(fileName, promoters)
 ```
@@ -157,21 +157,21 @@ save.promoters(fileName, promoters)
 
 ```{r eval=TRUE}
 genes.hannum_pred <- read.xlsx2("../data/Hannum/mmc5.xlsx", sheetName = "suppTable7", header = TRUE, stringsAsFactors = FALSE)
-genes.hannum_pred_over <- unique(genes.hannum_pred$Gene[ genes.hannum_pred$Coefficient > 0 ])
-genes.hannum_pred_under <- unique(genes.hannum_pred$Gene[ genes.hannum_pred$Coefficient <= 0 ])
-venn <- Venn2(genes.hannum_pred_over, genes.hannum_pred_under, names = c("Over", "Under"))
+genes.hannum_pred_pos <- unique(genes.hannum_pred$Gene[ genes.hannum_pred$Coefficient > 0 ])
+genes.hannum_pred_neg <- unique(genes.hannum_pred$Gene[ genes.hannum_pred$Coefficient <= 0 ])
+venn <- Venn2(genes.hannum_pred_pos, genes.hannum_pred_neg, names = c("Over", "Under"))
 # All gene symbols associated with age
 genes.hannum_pred.all <- unique(genes.hannum_pred$Gene)
 print(paste0("Total number of genes: ", length(genes.hannum_pred.all)))
 ```
 
 ```{r}
-fileName <- "../data/Hannum/Hannum_pred_over.bed"
-promoters <- gr_promoter_extract(selected = genes.hannum_pred_over, id = "symbol", upstream = 2000, downstream = 500)
+fileName <- "../data/Hannum/Hannum_pred_pos.bed"
+promoters <- gr_promoter_extract(selected = genes.hannum_pred_pos, id = "symbol", upstream = 2000, downstream = 500)
 save.promoters(fileName, promoters)
 
-fileName <- "../data/Hannum/Hannum_pred_under.bed"
-promoters <- gr_promoter_extract(selected = genes.hannum_pred_under, id = "symbol", upstream = 2000, downstream = 500)
+fileName <- "../data/Hannum/Hannum_pred_neg.bed"
+promoters <- gr_promoter_extract(selected = genes.hannum_pred_neg, id = "symbol", upstream = 2000, downstream = 500)
 save.promoters(fileName, promoters)
 ```
 
@@ -188,21 +188,21 @@ Directional age-associated genes, whole blood
 ```{r eval=TRUE}
 genes.peters <- read.xlsx2("../data/Peters/ncomms9570-s2.xlsx", sheetName = "Data.1", startRow = 3, header = TRUE, stringsAsFactors = FALSE)
 genes.peters <- genes.peters[ genes.peters$RANK != "n", ] # Keep 1497 genes
-genes.peters_over <- unique(genes.peters$NEW.Entrez.ID[ genes.peters$META.Direction == "+" ]) # 600 positively correlating
-genes.peters_under <- unique(genes.peters$NEW.Entrez.ID[ genes.peters$META.Direction == "-" ]) # 897 negatively correlating
-venn <- Venn2(genes.peters_over, genes.peters_under, c("Over", "Under"))
+genes.peters_pos <- unique(genes.peters$NEW.Entrez.ID[ genes.peters$META.Direction == "+" ]) # 600 positively correlating
+genes.peters_neg <- unique(genes.peters$NEW.Entrez.ID[ genes.peters$META.Direction == "-" ]) # 897 negatively correlating
+venn <- Venn2(genes.peters_pos, genes.peters_neg, c("Over", "Under"))
 # All gene symbols associated with age
-genes.peters.all <- grch37$symbol[ grch37$entrez %in% c(genes.peters_over, genes.peters_under) ] %>% unique
+genes.peters.all <- grch37$symbol[ grch37$entrez %in% c(genes.peters_pos, genes.peters_neg) ] %>% unique
 print(paste0("Total number of genes: ", length(genes.peters.all)))
 ```
 
 ```{r}
-fileName <- "../data/Peters/Peters_over.bed"
-promoters <- gr_promoter_extract(selected = genes.peters_over, id = "entrez", upstream = 2000, downstream = 500)
+fileName <- "../data/Peters/Peters_pos.bed"
+promoters <- gr_promoter_extract(selected = genes.peters_pos, id = "entrez", upstream = 2000, downstream = 500)
 save.promoters(fileName, promoters)
 
-fileName <- "../data/Peters/Peters_under.bed"
-promoters <- gr_promoter_extract(selected = genes.peters_under, id = "entrez", upstream = 2000, downstream = 500)
+fileName <- "../data/Peters/Peters_neg.bed"
+promoters <- gr_promoter_extract(selected = genes.peters_neg, id = "entrez", upstream = 2000, downstream = 500)
 save.promoters(fileName, promoters)
 ```
 
@@ -213,17 +213,17 @@ genes.ageatlas <- read.csv("../data/Cory.age.summary/AGE Atlas gender effects, p
 genes.ageatlas <- genes.ageatlas[ genes.ageatlas$p < 0.001, ] # Create subset of supposedly highly significant genes
 # summary(genes.ageatlas$coef[ genes.ageatlas$coef < 0 ])
 # summary(genes.ageatlas$coef[ genes.ageatlas$coef > 0 ])
-genes.ageatlas_over <- genes.ageatlas$Entrez.Gene.ID[ genes.ageatlas$coef > 0 ] %>% unique
-genes.ageatlas_under <- genes.ageatlas$Entrez.Gene.ID[ genes.ageatlas$coef < 0 ] %>% unique
+genes.ageatlas_pos <- genes.ageatlas$Entrez.Gene.ID[ genes.ageatlas$coef > 0 ] %>% unique
+genes.ageatlas_neg <- genes.ageatlas$Entrez.Gene.ID[ genes.ageatlas$coef < 0 ] %>% unique
 ```
 
 ```{r}
-fileName <- "../data/Cory.age.summary/AgeAtlas_over.bed"
-promoters <- gr_promoter_extract(selected = genes.ageatlas_over, id = "entrez", upstream = 2000, downstream = 500)
+fileName <- "../data/Cory.age.summary/AgeAtlas_pos.bed"
+promoters <- gr_promoter_extract(selected = genes.ageatlas_pos, id = "entrez", upstream = 2000, downstream = 500)
 save.promoters(fileName, promoters)
 
-fileName <- "../data/Cory.age.summary/AgeAtlas_under.bed"
-promoters <- gr_promoter_extract(selected = genes.ageatlas_under, id = "entrez", upstream = 2000, downstream = 500)
+fileName <- "../data/Cory.age.summary/AgeAtlas_neg.bed"
+promoters <- gr_promoter_extract(selected = genes.ageatlas_neg, id = "entrez", upstream = 2000, downstream = 500)
 save.promoters(fileName, promoters)
 ```
 
@@ -232,7 +232,7 @@ Overlap between directional Peters and AGE atlas genes, vs. all others
 ```{r eval=TRUE}
 genes.12345 <- unique(c(unique(genes.deMagalhaes.over$EntrezGeneID), unique(genes.deMagalhaes.under$EntrezGeneID), unique(genes.genage$entrez.gene.id), unique(grch37$entrez[ grch37$symbol %in% genes.longevitymap.all]), unique(grch37$entrez[ grch37$symbol %in% genes.jenage.all]), unique(grch37$entrez[ grch37$symbol %in% genes.hannum_corr.all])))
 
-Venn5(genes.peters_over, genes.peters_under, genes.ageatlas_over, genes.ageatlas_under, genes.12345)
+Venn5(genes.peters_pos, genes.peters_neg, genes.ageatlas_pos, genes.ageatlas_neg, genes.12345)
 ```
 
 

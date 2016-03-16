@@ -11,4 +11,4 @@ Scripts and data files for the epigenomic enrichment analysis of age-associated 
 
 - `R.Aging` - R scripts for visualization of the results.
 
-	- `genes_promoters_extract.Rmd` - extract promoters (+2000..-500bp arount TSS) of age-associated genes (`data` folder).
+	- `genes_promoters_extract.Rmd` - extract promoters (+2000..-500bp arount TSS) of age-associated _genes_ (`data` folder).

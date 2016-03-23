@@ -11,4 +11,6 @@ Gzip the files. Run `make` to create BED files. Remember to [liftOver](http://ge
 
 - `snpsites.txt` - file of SNP containing probes, from `wget --no-check-certificate https://www.rforge.net/IMA/snpsites.txt`
 
-- `raharris.Illumina_Infinium_450K_Array.pdf`, `dataprocessing.pdf` - data preprocessing suggestions
+- `NonspecificAndPolymorphic.xlsx` - a list of potential nonspecific probes and polymorphic probes of Illumina Human 27k Methylation Array, [BrainCloud](http://braincloud.jhmi.edu/downloads.htm), [source](http://braincloud.jhmi.edu/NonspecificAndPolymorphic.zip)
+
+- "[raharris.Illumina_Infinium_450K_Array.pdf](http://genboree.org/theCommons/attachments/2296/raharris.Illumina_Infinium_450K_Array.pdf)", "[dataprocessing.pdf](www.bristol.ac.uk/caite/geocode/newcastleshortcourse/dataprocessing.pdf)" - data preprocessing recommendations

@@ -25,6 +25,18 @@ De Magalhães, J. P., et.al. ["Meta-analysis of age-related gene expression prof
 	- `supplementary_tables*` - tables S3 and S4 contain 232 overespressed/146 underexpressed with age genes, consensus across all tissues. EntrezIDs and gene symbols, mixture of human and mouse IDs.
 	- `genes_deMagalhaes_over/under.txt/bed` - gene symbols of 232 overespressed/146 underexpressed with age genes. BED files contain promoters (+2000..-500bp) of these genes, extracted with `R.Aging/genes_promoters_extract.Rmd`
 
+### `Fernandez`
+
+Illumina 450K
+
+Supplementary data from Fernández AF, et.al. ["H3K4me1 marks DNA regions hypomethylated during aging in human stem and differentiated cells"](http://genome.cshlp.org/content/25/1/27/suppl/DC1) Genome Res 2015
+
+- `make.sh` - download and pre-process all supplementary data.
+
+- `Supplemental_TableLegends.txt` - headers of the supplemental tables
+
+The most useful at the momemt are Supplemental Tables 2-3 (MSCs CpGs) and 4-5 (blood CpGs), processed into BED files with `make`. But there's more, about twin age-emthylation differences.
+
 
 ### `genes/GenAge`
 

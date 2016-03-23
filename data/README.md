@@ -123,9 +123,9 @@ Illumina 450K
 
 - [Supplementary Data](http://static-content.springer.com/esm/art%3A10.1007%2Fs11357-014-9648-x/MediaObjects/11357_2014_9648_MOESM2_ESM.xls) contains several supplementary tables:
 
-Supplemental table 2S: 726 methylation markers correlated with age- and gene expression changes in peripheral blood
+Supplemental table 2S: 726 methylation markers correlated with age- and gene expression changes in peripheral blood (cpg_and_gene)
 
-Supplemental table 3S: 4,552 methylation markers correlated with age- but not with gene expression changes in peripheral blood
+Supplemental table 3S: 4,552 methylation markers correlated with age- but not with gene expression changes in peripheral blood (cpg_not_gene)
 
-Supplemental table 4S: 7,477 age-associated methylation markers identified in multiple studies
+Supplemental table 4S: 7,477 age-associated methylation markers identified in multiple studies (meta)
 

@@ -91,6 +91,17 @@ Illumina 450K
 - [Dataset_S02 (XLSX)](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3387108/bin/1120658109_sd02.xlsx) - 3,205 age-associated methylation markers differentially methylated in cord blood of newborns and CD4+ T cells of centenarians; 1,219 of them showed hypermethylation with age, 1,986 were found to be hypomethylated with age
 
 
+### `Horvath`
+
+Classical epigenetic age clock predictor from Horvath S: "[DNA methylation age of human tissues and cell types](http://genomebiology.biomedcentral.com/articles/10.1186/gb-2013-14-10-r115#MOESM1)". Genome Biol 2013
+
+- "[13059_2013_3156_MOESM3_ESM.csv](https://static-content.springer.com/esm/art%3A10.1186%2Fgb-2013-14-10-r115/MediaObjects/13059_2013_3156_MOESM3_ESM.csv)" - Additional file 3: Coefficient values for the DNAm age predictor. This Excel file provides detailed information on the multi-tissue age predictor defined using the training set data. The multi-tissue age predictor uses 353 CpGs, of which 193 and 160 have positive and negative correlations with age, respectively. The table also represents the coefficient values for the shrunken age predictor that is based on a subset of 110 CpGs (a subset of the 353 CpGs).
+
+- `make` - extracts genomic coordinates of CpG cites positively/negatively correlating with age as BED files.
+
+Software at [DNA methylation age and the epigenetic clock](https://labs.genetics.ucla.edu/horvath/dnamage/)
+
+
 ### `Peters`
 
 Peters MJ, et. al. ["The transcriptional landscape of age in human peripheral blood"](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4639797). Nat Commun 2015

@@ -102,6 +102,15 @@ Classical epigenetic age clock predictor from Horvath S: "[DNA methylation age o
 Software at [DNA methylation age and the epigenetic clock](https://labs.genetics.ucla.edu/horvath/dnamage/)
 
 
+### `Marttila`
+
+Illumina 450K
+
+Data from Marttila S, et.al. "[Ageing-associated changes in the human DNA methylome: genomic locations and effects on gene expression](http://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-015-1381-z)". BMC Genomics 2015
+
+- `12864_2015_1381_MOESM1_ESM.xlsx` - data from [Additional file 1:](https://static-content.springer.com/esm/art%3A10.1186%2Fs12864-015-1381-z/MediaObjects/12864_2015_1381_MOESM1_ESM.xlsx). Leukocyte-specific age-associated CpGs, 3,925 CpG probes positively, and 4,615 probes negatively correlated with age (8,540 total).
+
+
 ### `Peters`
 
 Peters MJ, et. al. ["The transcriptional landscape of age in human peripheral blood"](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4639797). Nat Commun 2015

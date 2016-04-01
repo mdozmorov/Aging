@@ -5,9 +5,9 @@ Makefiles for creating BED files of genomic coordinates for individual studies.
 
 Alisch R. et. al. ["Age-associated DNA methylation in pediatric populations"](http://genome.cshlp.org/content/22/4/623.full)
 
-Illumina 450K
+Illumina 450K. BED coordinates: 460 up, 1,505 dn, 1,965 total.
 
-- [Alisch_et_al_Sup_Table2.*](http://genome.cshlp.org/content/suppl/2012/02/01/gr.125187.111.DC1/Alisch_et_al_Sup_Table2.xls) - 2,078 regions correlated with age by methylation in peripheral blood; 479 of them showed positive correlation with age by methylation, 1,599 were found to be negatively correlated with age ("SSC.age.cor", 13th column). 
+- [Alisch_et_al_Sup_Table2.*](http://genome.cshlp.org/content/suppl/2012/02/01/gr.125187.111.DC1/Alisch_et_al_Sup_Table2.xls) - 2,078 regions correlated with age by methylation in peripheral blood; 479 of them showed positive correlation with age by methylation, 1,599 were found to be negatively correlated with age ("SSC.age.cor", 13th column).
 
 
 ### `Cory.age.summary`
@@ -27,7 +27,7 @@ De Magalhães, J. P., et.al. ["Meta-analysis of age-related gene expression prof
 
 ### `Fernandez`
 
-Illumina 450K
+Illumina 450K. BED coordinates: 18,735 up, 45,407 dn, 64,142 total.
 
 Supplementary data from Fernández AF, et.al. ["H3K4me1 marks DNA regions hypomethylated during aging in human stem and differentiated cells"](http://genome.cshlp.org/content/25/1/27/suppl/DC1) Genome Res 2015
 
@@ -35,7 +35,7 @@ Supplementary data from Fernández AF, et.al. ["H3K4me1 marks DNA regions hypome
 
 - `Supplemental_TableLegends.txt` - headers of the supplemental tables
 
-The most useful at the momemt are Supplemental Tables 2-3 (MSCs CpGs) and 4-5 (blood CpGs), processed into BED files with `make`. But there's more, about twin age-emthylation differences.
+The most useful at the momemt are Supplemental Tables 2-3 (MSCs CpGs) and 4-5 (blood CpGs), processed into BED files with `make`. But there's more, about twin age-methylation differences.
 
 
 ### `genes/GenAge`
@@ -62,7 +62,7 @@ Data from [Human Ageing Genomic Resources](http://genomics.senescence.info/downl
 
 Hannum G. et. al. ["Genome-wide methylation profiles reveal quantitative views of human aging rates"](http://www.sciencedirect.com/science/article/pii/S1097276512008933).
 
-Illumina 450K
+Illumina 450K. BED coordinates: 89 all, 71 primary.
 
 [Table S3. Aging Model Markers, Related to Figure 2.](http://www.sciencedirect.com/science/MiamiMultiMediaURL/1-s2.0-S1097276512008933/1-s2.0-S1097276512008933-mmc2.xlsx/272198/FULL/S1097276512008933/91cff6863693f2d294890d6fd28662e0/mmc2.xlsx) - A table of the methylation markers included in the primary aging model. The coefficient listed for each marker is its regression coefficient within the model. A second table is provided for the model based on all samples (primary and validation).
 
@@ -84,14 +84,16 @@ Illumina 450K
 
 ### `Heyn`
 
-Heyn, H., et.al. ["Distinct DNA methylomes of newborns and centenarians"](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3387108/)
+Illumina 450K. BED coordinates: 1,219 up, 1,986 dn, 3,205 total.
 
-Illumina 450K
+Heyn, H., et.al. ["Distinct DNA methylomes of newborns and centenarians"](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3387108/)
 
 - [Dataset_S02 (XLSX)](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3387108/bin/1120658109_sd02.xlsx) - 3,205 age-associated methylation markers differentially methylated in cord blood of newborns and CD4+ T cells of centenarians; 1,219 of them showed hypermethylation with age, 1,986 were found to be hypomethylated with age
 
 
 ### `Horvath`
+
+Illumina 450K. BED coordinates: 156 up, 196 dn, 352 total.
 
 Classical epigenetic age clock predictor from Horvath S: "[DNA methylation age of human tissues and cell types](http://genomebiology.biomedcentral.com/articles/10.1186/gb-2013-14-10-r115#MOESM1)". Genome Biol 2013
 
@@ -104,7 +106,7 @@ Software at [DNA methylation age and the epigenetic clock](https://labs.genetics
 
 ### `Marttila`
 
-Illumina 450K
+Illumina 450K. BED coordinates: 3,925 up, 4,615 dn, 8,540 total.
 
 Data from Marttila S, et.al. "[Ageing-associated changes in the human DNA methylome: genomic locations and effects on gene expression](http://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-015-1381-z)". BMC Genomics 2015
 
@@ -129,18 +131,18 @@ Supplementary Data 2A lists tissue-specific genes not/associated with age as 0/1
 
 ### `Rakyan`
 
-Rakyan V. et. al. ["Human aging-associated DNA hypermethylation occurs preferentially at bivalent chromatin domains"](http://genome.cshlp.org/content/early/2010/03/09/gr.103101.109)
+Illumina 27K. BED coordinates: 123 total
 
-Illumina 27K
+Rakyan V. et. al. ["Human aging-associated DNA hypermethylation occurs preferentially at bivalent chromatin domains"](http://genome.cshlp.org/content/early/2010/03/09/gr.103101.109)
 
 - [Supp_Table_3.*](http://genome.cshlp.org/content/suppl/2010/03/11/gr.103101.109.DC1/Supp_Table_3.xls) - 131 regions correlated with age by methylation in whole blood, and show the same directional age-associated DNA methylation change in CD4+ T-cells and CD14+ monocytes.
 
 
 ### `Reynolds`
 
-Reynolds, L. M. et. al. ["Age-related variations in the methylome associated with gene expression in human monocytes and T cells."](http://www.nature.com/ncomms/2014/141118/ncomms6366/full/ncomms6366.html#supplementary-information)
+Illumina 450K. BED coordinates: Monocytes - 355 up, 1,439 dn, 1,794 total; T-cells - 2,049 up, 546 dn, 2,595 total.
 
-Illumina 450K
+Reynolds, L. M. et. al. ["Age-related variations in the methylome associated with gene expression in human monocytes and T cells."](http://www.nature.com/ncomms/2014/141118/ncomms6366/full/ncomms6366.html#supplementary-information)
 
 - [Supplementary Data 1](http://www.nature.com/ncomms/2014/141118/ncomms6366/extref/ncomms6366-s2.xlsx) - 2,595 regions correlated with age by methylation in CD4+ T-cells. 2,049 of them showed positive correlation with age by methylation, 546 were found to be negatively correlated with age.
 
@@ -149,9 +151,9 @@ Illumina 450K
 
 ### `Steegenga`
 
-Steegenga, W. T., et. al. ["Genome-wide age-related changes in DNA methylation and gene expression in human PBMCs."](http://link.springer.com/content/pdf/10.1007%2Fs11357-014-9648-x.pdf)
+Illumina 450K. BED coordinates: Age-CpG-gene expression - 726; Age-CpG-not gene expression - 4,554; CpG meta analysis - 7,401. 
 
-Illumina 450K
+Steegenga, W. T., et. al. ["Genome-wide age-related changes in DNA methylation and gene expression in human PBMCs."](http://link.springer.com/content/pdf/10.1007%2Fs11357-014-9648-x.pdf)
 
 - [Supplementary Data](http://static-content.springer.com/esm/art%3A10.1007%2Fs11357-014-9648-x/MediaObjects/11357_2014_9648_MOESM2_ESM.xls) contains several supplementary tables:
 

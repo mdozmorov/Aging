@@ -149,6 +149,15 @@ Reynolds, L. M. et. al. ["Age-related variations in the methylome associated wit
 - [Supplementary Data 2](http://www.nature.com/ncomms/2014/141118/ncomms6366/extref/ncomms6366-s3.xlsx) - 2,259 regions correlated with age by methylation on CD14+ monocytes. 468 of them showed positive correlation with age by methylation, 1,791 were found to be negatively correlated with age.
 
 
+### `SNPs`
+
+Age-associated SNPs
+
+Pilling et al., [“Human Longevity Is Influenced by Many Genetic Variants.”](http://www.impactaging.com/papers/v8/n3/full/100930.html)
+
+- `SupTable1.*` - Lists the genetic variants included for each genetic risk score. SNPs associated with different diseases that have been tested for association with longevity
+- `SupTable2.*` - Includes the 1,000 most-associated variants from each of the four GWAS performed
+
 ### `Steegenga`
 
 Illumina 450K. BED coordinates: Age-CpG-gene expression - 726; Age-CpG-not gene expression - 4,554; CpG meta analysis - 7,401. 

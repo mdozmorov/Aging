@@ -35,7 +35,13 @@ Supplementary data from Fernández AF, et.al. ["H3K4me1 marks DNA regions hypome
 
 - `Supplemental_TableLegends.txt` - headers of the supplemental tables
 
-The most useful at the momemt are Supplemental Tables 2-3 (MSCs CpGs) and 4-5 (blood CpGs), processed into BED files with `make`. But there's more, about twin age-methylation differences.
+The most useful at the moment are Supplemental Tables 2-3 (MSCs CpGs) and 4-5 (blood CpGs), processed into BED files with `make`. But there's more, about twin age-methylation differences.
+
+### `Florath`
+
+Illumina 450K. BED coordinates: 119 up, 43 dn, 162 total.
+
+Table 2 from Florath et al., [“Cross-Sectional and Longitudinal Changes in DNA Methylation with Age.”](http://hmg.oxfordjournals.org/content/23/5/1186.long), 162 differentially methylated CpG sites for age with Bonferroni-corrected statistical significance (P < 2.5 × 10-4)
 
 
 ### `genes/GenAge`
@@ -172,3 +178,8 @@ Supplemental table 3S: 4,552 methylation markers correlated with age- but not wi
 
 Supplemental table 4S: 7,477 age-associated methylation markers identified in multiple studies (meta)
 
+### `Weidner`
+
+Illumina 450K. BED coordinates: 42 up, 57 dn, 99 total.
+
+Additional file 2 from Weidner et al., [“Aging of Blood Can Be Tracked by DNA Methylation Changes at Just Three CpG Sites.”](http://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r24) - Beta values for 102 AR-GpGs from 575 samples

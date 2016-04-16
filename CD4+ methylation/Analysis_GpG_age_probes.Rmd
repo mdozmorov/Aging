@@ -20,6 +20,8 @@ library(openxlsx)
 library(MDmisc)
 library(annotables)
 library(lumi)
+library(ggplot2)
+library(reshape2)
 ```
 
 # Selection of Age-associated CpG probes
@@ -35,6 +37,8 @@ colnames(mtx) <- c("X", "coeff.lm", "pval.lm", "r2.lm", "lmpval", "coeff.lm.M", 
 for (i in 2:ncol(mtx)) {
   mtx[, i] <- as.numeric(mtx[, i])
 }
+# Remove probes starting with "rs"
+mtx <- mtx[ !grepl("^rs", mtx$X), ]
 # Correct p-values for multiple testing
 mtx$pval.br <- p.adjust(mtx$pval.br, method = "BH")
 # Subset by significant p-value
@@ -49,12 +53,14 @@ writeLines(mtx$X[ mtx$coeff.br > 0 ], "results/significant_cpg_up.txt")
 writeLines(mtx$X[ mtx$coeff.br < 0 ], "results/significant_cpg_dn.txt")
 ```
 
-# Detection of CpG probes showing largest differences
-
-We compare median M-values between groups of individuals at lower 25th and higher 75th percentile of our age range. 
-
 ```{r}
 load(file = "data/combat_edata_parpriorTrue.rda") # Batch effect-cleaned beta values data
+```
+
+```{r eval=FALSE}
+# Detection of CpG probes showing largest differences
+# We compare median M-values between groups of individuals at lower 25th and higher 75th percentile of our age range. 
+
 # Detect percentiles
 Age.q <- quantile(annot$Age)
 print(paste("Number of patients in the lower 25th age range percentile, ", min(annot$Age), "-", Age.q["25%"], "range: ", length(annot$Age[ annot$Age < Age.q["25%"] ])))
@@ -66,29 +72,25 @@ combat_edata[combat_edata > 1] <- 0.9999999999999999 # Set large outliers to max
 combat_edata[combat_edata < 0] <- 0.0000000000000001 # Set small outliers to minimum of (0, 1) range
 # Differences between median M values
 b2M.diff <- vector(mode = "numeric", length = nrow(mtx))
-for (i in 1:nrow(mtx)) {
-  b2M.diff[i] <- median(beta2m(combat_edata[ rownames(combat_edata) == mtx$X[i], annot$Age < Age.q["75%"] & !is.na(combat_edata[ rownames(combat_edata) == mtx$X[i], ])])) - 
-                 median(beta2m(combat_edata[ rownames(combat_edata) == mtx$X[i], annot$Age > Age.q["25%"] & !is.na(combat_edata[ rownames(combat_edata) == mtx$X[i], ])]))
-}
-# hist(b2M.diff)
-
 # Wilcoxon p-value
 wilcox.pval <- vector(mode = "numeric", length = nrow(mtx))
+# Testing each row
 for (i in 1:nrow(mtx)) {
-  wilcox.pval[i] <- wilcox.test(combat_edata[ rownames(combat_edata) == mtx$X[i], annot$Age < Age.q["25%"] & !is.na(combat_edata[ rownames(combat_edata) == mtx$X[i], ])], 
-                                combat_edata[ rownames(combat_edata) == mtx$X[i], annot$Age > Age.q["75%"] & !is.na(combat_edata[ rownames(combat_edata) == mtx$X[i], ])])$p.value
+  print(i)
+  M.upper <- beta2m(combat_edata[ mtx$X[i], annot$Age < Age.q["75%"] & !is.na(combat_edata[ mtx$X[i], ]) ])
+  M.lower <- beta2m(combat_edata[ mtx$X[i], annot$Age < Age.q["25%"] & !is.na(combat_edata[ mtx$X[i], ]) ])
+  b2M.diff[i] <- mean(M.upper) - mean(M.lower) # Get difference
+  wilcox.pval[i] <- wilcox.test(M.upper, M.lower)$p.value # Get p-value
 }
-wilcox.pval <- p.adjust(wilcox.pval, method = "BH")
-# hist(-log10(wilcox.pval))
 save(list = c("b2M.diff", "wilcox.pval"), file = "data/significant_b2M_differences.rda")
 ```
 
-```{r}
+```{r eval=FALSE}
 load(file = "data/significant_b2M_differences.rda")
 # Combine CpG names, M-value differences, and significance p-values
 b2M.diff.sig <- data.frame(X = mtx$X, b2M.diff = b2M.diff, wilcox.pval = wilcox.pval, stringsAsFactors = FALSE)
 # Select those with abs(deltaM) > 1 and significant p-value
-b2M.diff.sig <- b2M.diff.sig[ abs(b2M.diff.sig$b2M.diff) > 1 & b2M.diff.sig$wilcox.pval < 0.05, ]
+b2M.diff.sig <- b2M.diff.sig[ abs(b2M.diff.sig$b2M.diff) > 1 & p.adjust(b2M.diff.sig$wilcox.pval, method = "BH") < 0.1, ]
 # Order by p-value
 b2M.diff.sig <- b2M.diff.sig[ order(b2M.diff.sig$wilcox.pval), ]
 ```
@@ -120,7 +122,6 @@ mtx <- mtx[ -ind, ]
 We attach selected probe annotations provided by Illumina. The results are in 
 
 - `results/correlation_results_significant.txt` - all significant CpG probes
-- `results/correlation_results_significant_top.txt` - top significant CpG probes
 
 | Column Name                 | Description                                                                                              |
 |-----------------------------|----------------------------------------------------------------------------------------------------------|
@@ -146,24 +147,76 @@ We attach selected probe annotations provided by Illumina. The results are in
 # Read in 450K annotation
 ANNOT <- "/Users/mikhail/Documents/Work/GenomeRunner/Aging/Illumina/GPL13534-11288.txt.gz"
 annot.cg <- read.table("/Users/mikhail/Documents/Work/GenomeRunner/Aging/Illumina/GPL13534-11288.txt.gz", sep = "\t", skip=37, header=T, stringsAsFactors = FALSE, fill = T)
+# Gene annotations
+grch38.slim <- grch38[, c("symbol", "description")]
+grch38.slim <- unique(grch38.slim) # Get rid of duplicated rows
+grch38.slim$description <- gsub(" \\[.+?\\]", "" , grch38.slim$description)
 # Attach selected annotations to the full matrix
 mtx <- left_join(mtx, annot.cg[, c("ID", "CHR", "MAPINFO", "Strand", "Probe_SNPs", "Probe_SNPs_10", "UCSC_RefGene_Name", "UCSC_RefGene_Group", "UCSC_CpG_Islands_Name", "Relation_to_UCSC_CpG_Island", "Phantom", "DMR", "Enhancer", "HMM_Island", "Regulatory_Feature_Name", "Regulatory_Feature_Group", "DHS")], by =c("X" = "ID"), stringsAsFactors = FALSE)
-# Attach selected annotations to the significant matrix
-b2M.diff.sig <- left_join(b2M.diff.sig, annot.cg[, c("ID", "CHR", "MAPINFO", "Strand", "Probe_SNPs", "Probe_SNPs_10", "UCSC_RefGene_Name", "UCSC_RefGene_Group", "UCSC_CpG_Islands_Name", "Relation_to_UCSC_CpG_Island", "Phantom", "DMR", "Enhancer", "HMM_Island", "Regulatory_Feature_Name", "Regulatory_Feature_Group", "DHS")], by =c("X" = "ID"), stringsAsFactors = FALSE)
+# Full matrix of significant CpGs
 # Collapse repetitive names, like "ABAT;ABAT"
 mtx$UCSC_RefGene_Name <- sapply(mtx$UCSC_RefGene_Name, function(x) strsplit(x, ";") %>% unlist %>% sort %>% unique %>% paste(collapse="|")) %>% unlist %>% as.character  
 mtx$UCSC_RefGene_Group <- sapply(mtx$UCSC_RefGene_Group, function(x) strsplit(x, ";") %>% unlist %>% sort %>% unique %>% paste(collapse="|")) %>% unlist %>% as.character  
-b2M.diff.sig$UCSC_RefGene_Name <- sapply(b2M.diff.sig$UCSC_RefGene_Name, function(x) strsplit(x, ";") %>% unlist %>% sort %>% unique %>% paste(collapse="|")) %>% unlist %>% as.character  
-b2M.diff.sig$UCSC_RefGene_Group <- sapply(b2M.diff.sig$UCSC_RefGene_Group, function(x) strsplit(x, ";") %>% unlist %>% sort %>% unique %>% paste(collapse="|")) %>% unlist %>% as.character  
+# Attach gene name description
+UCSC_RefGene_Description <- vector(mode = "character", length = length(mtx$UCSC_RefGene_Name))
+for (i in 1:length(mtx$UCSC_RefGene_Name)) {
+  if (all(!is.na(mtx$UCSC_RefGene_Name[i]), mtx$UCSC_RefGene_Name[i] != "")) { # Proceed if something is present
+    a = mtx$UCSC_RefGene_Name[i] # Gene(s) of interest
+    b = strsplit(a, "|", fixed = TRUE) %>% unlist # Split them, if multiple
+    c = grch38.slim[ grch38.slim$symbol %in% b, "description"] # Append description
+    UCSC_RefGene_Description[i] <- paste(c$description, collapse = "|") # Collapse descriptions, if multiple
+  }
+}
+mtx <- cbind(mtx, UCSC_RefGene_Description)
 # Save the results
 write.table(mtx, "results/correlation_results_significant.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+```
+
+```{r eval=FALSE}
+# - `results/correlation_results_significant_top.txt` - top significant CpG probes
+# Attach selected annotations to the significant matrix
+b2M.diff.sig <- left_join(b2M.diff.sig, annot.cg[, c("ID", "CHR", "MAPINFO", "Strand", "Probe_SNPs", "Probe_SNPs_10", "UCSC_RefGene_Name", "UCSC_RefGene_Group", "UCSC_CpG_Islands_Name", "Relation_to_UCSC_CpG_Island", "Phantom", "DMR", "Enhancer", "HMM_Island", "Regulatory_Feature_Name", "Regulatory_Feature_Group", "DHS")], by =c("X" = "ID"), stringsAsFactors = FALSE)
+# The most significant CpGs
+# Collapse repetitive names, like "ABAT;ABAT"
+b2M.diff.sig$UCSC_RefGene_Name <- sapply(b2M.diff.sig$UCSC_RefGene_Name, function(x) strsplit(x, ";") %>% unlist %>% sort %>% unique %>% paste(collapse="|")) %>% unlist %>% as.character  
+b2M.diff.sig$UCSC_RefGene_Group <- sapply(b2M.diff.sig$UCSC_RefGene_Group, function(x) strsplit(x, ";") %>% unlist %>% sort %>% unique %>% paste(collapse="|")) %>% unlist %>% as.character  
+# Attach gene name description
+UCSC_RefGene_Description <- vector(mode = "character", length = length(b2M.diff.sig$UCSC_RefGene_Name))
+for (i in 1:length(b2M.diff.sig$UCSC_RefGene_Name)) {
+  if (!is.na(b2M.diff.sig$UCSC_RefGene_Name[i] & b2M.diff.sig$UCSC_RefGene_Name != "")) { # Proceed if something is present
+    a = b2M.diff.sig$UCSC_RefGene_Name[i] # Gene(s) of interest
+    b = strsplit(a, "|", fixed = TRUE) %>% unlist # Split them, if multiple
+    c = left_join(data.frame(gene = b, stringsAsFactors = FALSE), grch38[, c("symbol", "description")], by = c("gene" = "symbol")) # Append description
+    UCSC_RefGene_Description[i] <- paste(c$description, collapse = "|") # Collapse descriptions, if multiple
+  }
+}
+b2M.diff.sig <- cbind(b2M.diff.sig, UCSC_RefGene_Description)
 write.table(b2M.diff.sig, "results/correlation_results_significant_top.txt", sep = "\t", quote = FALSE, row.names = FALSE)
 ```
 
-Let's look at the top 10 of the most significant ones.
+Let's look at the top 20 of the most significant ones.
 
 ```{r}
-b2M.diff.sig[1:10, c("X", "b2M.diff", "wilcox.pval", "UCSC_RefGene_Name", "UCSC_RefGene_Group", "Relation_to_UCSC_CpG_Island", "Phantom", "DMR", "Enhancer", "HMM_Island", "Regulatory_Feature_Group", "DHS")] %>% pander
+mtx[1:20, c("X", "coeff.br", "pval.br", "r2.br", "UCSC_RefGene_Name", "UCSC_RefGene_Description")] %>% pander
+```
+
+And the actual methylation changes of the top five CpGs.
+
+```{r fig.height=4}
+cpg <- c("cg16867657", "cg18898125", "cg04212239", "cg19283806", "cg00474657")
+
+mtx.plot <- data.frame(t(combat_edata[cpg, ]), age = annot$Age)
+mtx.plot <- melt(mtx.plot, id.vars = "age")
+
+ggplot(data = mtx.plot, aes(x = age, y = value)) +
+  geom_point(size = 1) +
+  stat_smooth(method="lm") +
+  facet_grid(. ~ variable) +
+  labs(x = "Age", y = "beta-value") +
+  theme(axis.text.x = element_text(size = 12), axis.text.y = element_text(size = 12), 
+        axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14),
+        legend.title=element_blank(),
+        strip.text.x = element_text(size = 12))
 ```
 
 
@@ -191,11 +244,6 @@ pie(chrom, main = "CpGs positively correlated with age", col = rainbow(23), cloc
 
 # Genes with counts of CpG probes _positively_ correlated with Age
 
-```{r}
-# Gene annotations
-grch38.slim <- grch38[, c("symbol", "description")]
-grch38.slim <- unique(grch38.slim) # Get rid of duplicated rows
-```
 
 ```{r}
 mtx.cpg.up <- mtx$UCSC_RefGene_Name[ mtx$coeff.br > 0 & mtx$UCSC_RefGene_Name != "" ]
@@ -231,7 +279,7 @@ pander(mtx.cpg.dn[1:20, ])
 
 Results are in "results/enrichment_results_significant_genes_up.xlsx" and "results/enrichment_results_significant_genes_dn.xlsx" files
 
-```{r}
+```{r eval=FALSE}
 library(xlsx)
 library(org.Hs.eg.db)
 # A wrapper function to perform all functional enrichment analyses. The 'fileName' should have 'xlsx' extension

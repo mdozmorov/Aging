@@ -44,6 +44,22 @@ mtx <- mtx[, grep("Horvath", colnames(mtx), invert = T)]
 mtx <- mtx[, grep("Fernandez", colnames(mtx), invert = T)]
 ```
 
+
+```{r}
+# Additional data
+fname <- c("data.gr/gr_ageFlorath_rdmHistone_gPk-processed/matrix_PVAL.txt")#, "data.gr/gr_agecpgs_rdmDNase_gPk-imputed/matrix_PVAL.txt")
+mtx.additional <- gr_load_data(fname, col.subset = c("pos", "neg"), p2z = F) %>% gr_transform()
+mtx <- cbind(mtx, mtx.additional[match(rownames(mtx), rownames(mtx.additional)), ] )
+
+# fname <- c("data.gr/gr_McClay_mc_rdmHistone_gPk-processed/matrix_PVAL.txt")#, "data.gr/gr_agecpgs_rdmDNase_gPk-imputed/matrix_PVAL.txt")
+# mtx.additional <- gr_load_data(fname, col.subset = c("pos", "neg"), p2z = F) %>% gr_transform()
+# mtx <- cbind(mtx, mtx.additional[match(rownames(mtx), rownames(mtx.additional)), ] )
+
+fname <- c("data.gr/gr_ageWeidner_rdmHistone_gPk-processed/matrix_PVAL.txt")#, "data.gr/gr_agecpgs_rdmDNase_gPk-imputed/matrix_PVAL.txt")
+mtx.additional <- gr_load_data(fname, col.subset = c("pos", "neg"), p2z = F) %>% gr_transform()
+mtx <- cbind(mtx, mtx.additional[match(rownames(mtx), rownames(mtx.additional)), ] )
+```
+
 ### Dendrogram
 
 ```{r checkIAC, fig.height=7}
@@ -75,30 +91,32 @@ h <- heatmap.2(mtx.cor, Rowv=hclustergram.ext, Colv=hclustergram.ext, col=col3(2
 # key=F,  symkey=T, keysize=0.1      
 ```
 
+```{r}
+# Save correlogram
+pdf("Figures/Figure_Meta_regulatory_similarity.pdf", height = 7)
+par(oma=c(7,0,0,7)) # Make right and bottom margins larger
+heatmap.2(mtx.cor, Rowv=hclustergram.ext, Colv=hclustergram.ext, col=col3(20),  density.info="none", trace="none", cexCol=1, cexRow=1, cellnote=formatC(mtx.cor, format="f", digits=2), notecex=0.8, notecol='black')
+dev.off()
+```
+
 ### Differential regulatory analysis
 
 We are testing differential enrichment of histone marks and chromatin states in T cells. Resulte are in `"Tables/Supplementary Table S7.xlsx"` file.
 
 ```{r}
-# Prepare the data
-mtx.d <- gr_load_data("data.gr/gr_agecpgs_rdmHistone_gPk-processed/matrix_PVAL.txt", col.subset = c("pos", "neg"), p2z = F) %>% gr_transform()
-mtx.d <- mtx.d[, grep("monocytes", colnames(mtx.d), invert = T)]
-mtx.d <- mtx.d[, grep("Horvath", colnames(mtx.d), invert = T)]
-mtx.d <- mtx.d[, grep("Fernandez", colnames(mtx.d), invert = T)]
 # Prepare clustering
-IAC = cor((mtx.d), use="p")
 cluster1=hclust(as.dist(1-IAC), method="ward.D") # "ward", "single", "complete", "average", "mcquitty", "median" or "centroid".
 # plot(cluster1, cex=1.2)
 mtx.clust <- gr_clusters(as.dendrogram(cluster1), height = 3) # Get info about two clusters
 # Perform DEGFS analysis
-mtx.degfs <- gr_degfs(mtx.d, mtx.clust)
+mtx.degfs <- gr_degfs(mtx, mtx.clust)
 res <- mtx.degfs$c1_vs_c2[mtx.degfs$c1_vs_c2$cell %in% c("E033", "E034", "E037", "E038", "E039", "E040", "E041", "E042", "E043", "E044", "E045", "E047", "E048", "E062"),  c("epigenomic_name", "adj.p.val", "c1", "c2", "cell", "cell_desc", "factor", "factor_desc")]
 # Save the results
-unlink("Tables/Supplementary Table S7.xlsx")
-write.xlsx2(res, "Tables/Supplementary Table S7.xlsx", sheetName = "Histone", append = TRUE)
+unlink("Tables/Supplementary Table - DEGFS analysis.xlsx")
+write.xlsx2(res, "Tables/Supplementary Table - DEGFS analysis.xlsx", sheetName = "Histone", append = TRUE)
 ```
 
-```{r}
+```{r eval=FALSE}
 # Prepare the data
 mtx.d <- gr_load_data("data.gr/gr_agecpgs_rdmchromStates15/matrix_PVAL.txt", col.subset = c("pos", "neg"), p2z = F) %>% gr_transform()
 mtx.d <- mtx.d[, grep("monocytes", colnames(mtx.d), invert = T)]
@@ -154,7 +172,7 @@ scores <- mutate(scores, Name = rownames(scores), Category = ifelse(grepl("pos",
 pt <- ggplot(data=scores, aes(x=as.numeric(PC1), y=as.numeric(PC2), label=Name)) +
   geom_point(aes(color = Category), size = 4) +
   ggtitle("PCA of the regulatory similarities") + 
-  labs(x = "PC1 (41.71%)", y = "PC2 (29.93%") +
+  labs(x = "PC1 (40.43%)", y = "PC2 (18.75%") +
   theme(plot.title = element_text(lineheight = 0.8, face="bold")) +
   scale_color_manual(values=c("red", "green", "blue", "black")) +
   geom_hline(yintercept = 0, colour = "gray65") +
@@ -162,29 +180,25 @@ pt <- ggplot(data=scores, aes(x=as.numeric(PC1), y=as.numeric(PC2), label=Name))
   geom_text_repel(colour = "black", size = 4) 
 # + scale_x_continuous(limits = c(-60, 60))
 plot(pt)
-# ggsave(filename="Figures/Figure_Meta_regulatory_similarity.pdf", plot=pt, height = 9)
+# ggsave(filename="Figures/Supplementary Figure 3 - PCA epigenomic similarity.pdf", plot=pt, height = 9)
 ```
 
-The figures are saved in the `"Figures/Figure_Meta_regulatory_similarity.pdf"` file.
+The figures are saved in the `"Figures/Supplementary Figure 3 - PCA epigenomic similarity.pdf"` file.
 
 ```{r}
-pdf("Figures/Figure_Meta_regulatory_similarity.pdf", height = 7)
-# Save dendrogram
-plot(cluster1, cex=1.2)
+pdf("Figures/Supplementary Figure 3 - PCA epigenomic similarity.pdf", height = 7)
 # Save PCA plot
 pt <- ggplot(data=scores, aes(x=as.numeric(PC1), y=as.numeric(PC2), label=Name)) +
   geom_point(aes(color = Category), size = 4) +
   ggtitle("PCA of the regulatory similarities") + 
-  labs(x = "PC1 (41.71%)", y = "PC2 (29.93%") +
+  labs(x = "PC1 (40.43%)", y = "PC2 (18.75%") +
   theme(plot.title = element_text(lineheight = 0.8, face="bold")) +
   scale_color_manual(values=c("red", "green", "blue", "black")) +
   geom_hline(yintercept = 0, colour = "gray65") +
   geom_vline(xintercept = 0, colour = "gray65") +
   geom_text_repel(colour = "black", size = 4) 
 plot(pt)
-# Save correlogram
-par(oma=c(7,0,0,7)) # Make right and bottom margins larger
-heatmap.2(mtx.cor, Rowv=hclustergram.ext, Colv=hclustergram.ext, col=col3(20),  density.info="none", trace="none", cexCol=1, cexRow=1, cellnote=formatC(mtx.cor, format="f", digits=2), notecex=0.8, notecol='black')
+
 dev.off()
 ```
 

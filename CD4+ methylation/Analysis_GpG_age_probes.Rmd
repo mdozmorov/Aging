@@ -67,8 +67,8 @@ combat_edata[combat_edata < 0] <- 0.0000000000000001 # Set small outliers to min
 # Differences between median M values
 b2M.diff <- vector(mode = "numeric", length = nrow(mtx))
 for (i in 1:nrow(mtx)) {
-  b2M.diff[i] <- median(beta2m(combat_edata[ rownames(combat_edata) == mtx$X[i], annot$Age < Age.q["25%"] & !is.na(combat_edata[ rownames(combat_edata) == mtx$X[i], ])])) - 
-                 median(beta2m(combat_edata[ rownames(combat_edata) == mtx$X[i], annot$Age > Age.q["75%"] & !is.na(combat_edata[ rownames(combat_edata) == mtx$X[i], ])]))
+  b2M.diff[i] <- median(beta2m(combat_edata[ rownames(combat_edata) == mtx$X[i], annot$Age < Age.q["75%"] & !is.na(combat_edata[ rownames(combat_edata) == mtx$X[i], ])])) - 
+                 median(beta2m(combat_edata[ rownames(combat_edata) == mtx$X[i], annot$Age > Age.q["25%"] & !is.na(combat_edata[ rownames(combat_edata) == mtx$X[i], ])]))
 }
 # hist(b2M.diff)
 

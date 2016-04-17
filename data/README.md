@@ -63,6 +63,22 @@ Data from [Human Ageing Genomic Resources](http://genomics.senescence.info/downl
 
 - `[longevity_genes.zip](http://genomics.senescence.info/longevity/longevity_genes.zip)` and `longevity.csv` - population-specific genes and rsids associated with longevity. 
 
+### `genes/Peters`
+
+Peters MJ, et. al. ["The transcriptional landscape of age in human peripheral blood"](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4639797). Nat Commun 2015
+
+Supplementary Data 1 provides gene lists, statistics and, importantly, directionality of correlations. The directionality is clearly defined for the whole blood only. For other tissues, there are association statistics (p-values), with Z-scores not present for brain tissues.
+
+Supplementary Data 2A lists tissue-specific genes not/associated with age as 0/1. Use directionality!
+
+- `ncomms9570.pdf` - manuscript
+- `ncomms9570-s1.pdf` - Supplementary Information: Supplementary Figures 1-10, Supplementary Tables 1-21, Supplementary Notes 1-2, Supplementary Acknowledgements and Supplementary References
+- `ncomms9570-s2.xlsx` - Supplementary Data 1: Discovery, replication and generalization results. Y = yes, N = no; - is negative direction, + = positive direction; weight = sample size, P = p-value; WB = whole blood.
+- `ncomms9570-s3.xlsx` - Supplementary Data 2: Number of genes that associate with age across all tissues. 2A: A gene-based overview for age-association across all tissues. 2B: A gene-based overview for significant expression across all tissues.
+- `ncomms9570-s4.xlsx` - Supplementary Data 3: Up/down regulated gene set analyses in WEBGESTALT and GENENETWORK
+- `ncomms9570-s5.xlsx` - Supplementary Data 4: Methylation results: Sobel test for methylation-based mediation of age-expression association
+- `ncomms9570-s6.xlsx` - Supplementary Data 5: Transcriptomic age prediction formulas. 5A: Prediction formula weights for all participating cohorts (based on Leave-One-Out Meta-Analyses). 5B: The average "transcriptomic predictor formula" - the GENERAL predictor - for external cohorts
+
 
 ### `Hannum`
 
@@ -118,22 +134,6 @@ Data from Marttila S, et.al. "[Ageing-associated changes in the human DNA methyl
 
 - `12864_2015_1381_MOESM1_ESM.xlsx` - data from [Additional file 1:](https://static-content.springer.com/esm/art%3A10.1186%2Fs12864-015-1381-z/MediaObjects/12864_2015_1381_MOESM1_ESM.xlsx). Leukocyte-specific age-associated CpGs, 3,925 CpG probes positively, and 4,615 probes negatively correlated with age (8,540 total).
 
-
-### `Peters`
-
-Peters MJ, et. al. ["The transcriptional landscape of age in human peripheral blood"](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4639797). Nat Commun 2015
-
-Supplementary Data 1 provides gene lists, statistics and, importantly, directionality of correlations. The directionality is clearly defined for the whole blood only. For other tissues, there are association statistics (p-values), with Z-scores not present for brain tissues.
-
-Supplementary Data 2A lists tissue-specific genes not/associated with age as 0/1. Use directionality!
-
-- `ncomms9570.pdf` - manuscript
-- `ncomms9570-s1.pdf` - Supplementary Information: Supplementary Figures 1-10, Supplementary Tables 1-21, Supplementary Notes 1-2, Supplementary Acknowledgements and Supplementary References
-- `ncomms9570-s2.xlsx` - Supplementary Data 1: Discovery, replication and generalization results. Y = yes, N = no; - is negative direction, + = positive direction; weight = sample size, P = p-value; WB = whole blood.
-- `ncomms9570-s3.xlsx` - Supplementary Data 2: Number of genes that associate with age across all tissues. 2A: A gene-based overview for age-association across all tissues. 2B: A gene-based overview for significant expression across all tissues.
-- `ncomms9570-s4.xlsx` - Supplementary Data 3: Up/down regulated gene set analyses in WEBGESTALT and GENENETWORK
-- `ncomms9570-s5.xlsx` - Supplementary Data 4: Methylation results: Sobel test for methylation-based mediation of age-expression association
-- `ncomms9570-s6.xlsx` - Supplementary Data 5: Transcriptomic age prediction formulas. 5A: Prediction formula weights for all participating cohorts (based on Leave-One-Out Meta-Analyses). 5B: The average "transcriptomic predictor formula" - the GENERAL predictor - for external cohorts
 
 ### `Rakyan`
 

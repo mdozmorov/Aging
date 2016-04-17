@@ -38,7 +38,7 @@ lmp <- function (modelobject) {
 ```{r eval=TRUE}
 # Load the actual episimilarity data
 fname <- c("data.gr/gr_agecpgs_rdmHistone_gPk-processed/matrix_PVAL.txt")#, "data.gr/gr_agecpgs_rdmDNase_gPk-imputed/matrix_PVAL.txt")
-mtx <- gr_load_data(fname, col.subset = c("pos", "neg"), p2z = F) %>% gr_transform()
+mtx <- gr_load_data(fname, col.subset = c("pos", "neg"), p2z = F)
 mtx <- mtx[, grep("monocytes", colnames(mtx), invert = T)]
 mtx <- mtx[, grep("Horvath", colnames(mtx), invert = T)]
 mtx <- mtx[, grep("Fernandez", colnames(mtx), invert = T)]

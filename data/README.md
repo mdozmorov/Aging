@@ -79,6 +79,12 @@ Supplementary Data 2A lists tissue-specific genes not/associated with age as 0/1
 - `ncomms9570-s5.xlsx` - Supplementary Data 4: Methylation results: Sobel test for methylation-based mediation of age-expression association
 - `ncomms9570-s6.xlsx` - Supplementary Data 5: Transcriptomic age prediction formulas. 5A: Prediction formula weights for all participating cohorts (based on Leave-One-Out Meta-Analyses). 5B: The average "transcriptomic predictor formula" - the GENERAL predictor - for external cohorts
 
+### `genes/Sood`
+
+Sood et al., [“A Novel Multi-Tissue RNA Diagnostic of Healthy Ageing Relates to Cognitive Health Status.”](http://genomebiology.biomedcentral.com/articles/10.1186/s13059-015-0750-x)
+
+- `13059_2015_750_MOESM1_ESM.xlsx` - 150 multi-tissue biological age classifier. [Source](https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-015-0750-x/MediaObjects/13059_2015_750_MOESM1_ESM.xlsx). An Excel spreadsheet containing data related to our study with six tabs: 1) analysis of the top 150 genes from age prototype classifier in PUBMED; 2) the top 670 genes from the first stage of the project; 3) phenodata for the training data set and validation data sets in our study; 4) a list of prior markers in the literature for Alzheimer’s disease; 5) positional gene enrichment analysis; 6) sample information for the BrainEac study
+
 
 ### `Hannum`
 

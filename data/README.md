@@ -15,16 +15,6 @@ Illumina 450K. BED coordinates: 460 up, 1,505 dn, 1,965 total.
 - `AGE Atlas gender effects, part 2.csv` - Data from [AGE Atlas: gender effects, part 2](http://blog.corygil.es/age-atlas/gender-effects-part-2.html)
 
 
-### `deMagalhaes`
-
-De Magalhães, J. P., et.al. ["Meta-analysis of age-related gene expression profiles identifies common signatures of aging"](http://bioinformatics.oxfordjournals.org/content/25/7/875.short)
-
-- [signatures_supplement.zip](http://genomics.senescence.info/gene_expression/signatures_supplement.zip) A Conserved Gene Expression Signature of Mammalian Aging on [Human Ageing Genomic Resources](http://genomics.senescence.info/gene_expression/signatures.html).
-
-	- `supplementary_material.pdf` - description of the supplementary tables
-	- `supplementary_tables*` - tables S3 and S4 contain 232 overespressed/146 underexpressed with age genes, consensus across all tissues. EntrezIDs and gene symbols, mixture of human and mouse IDs.
-	- `genes_deMagalhaes_over/under.txt/bed` - gene symbols of 232 overespressed/146 underexpressed with age genes. BED files contain promoters (+2000..-500bp) of these genes, extracted with `R.Aging/genes_promoters_extract.Rmd`
-
 ### `Fernandez`
 
 Illumina 450K. BED coordinates: 18,735 up, 45,407 dn, 64,142 total.
@@ -44,6 +34,16 @@ Illumina 450K. BED coordinates: 119 up, 43 dn, 162 total.
 Table 2 from Florath et al., [“Cross-Sectional and Longitudinal Changes in DNA Methylation with Age.”](http://hmg.oxfordjournals.org/content/23/5/1186.long), 162 differentially methylated CpG sites for age with Bonferroni-corrected statistical significance (P < 2.5 × 10-4)
 
 
+### `genes/deMagalhaes`
+
+De Magalhães, J. P., et.al. ["Meta-analysis of age-related gene expression profiles identifies common signatures of aging"](http://bioinformatics.oxfordjournals.org/content/25/7/875.short)
+
+- [signatures_supplement.zip](http://genomics.senescence.info/gene_expression/signatures_supplement.zip) A Conserved Gene Expression Signature of Mammalian Aging on [Human Ageing Genomic Resources](http://genomics.senescence.info/gene_expression/signatures.html).
+
+	- `supplementary_material.pdf` - description of the supplementary tables
+	- `supplementary_tables*` - tables S3 and S4 contain 232 overespressed/146 underexpressed with age genes, consensus across all tissues. EntrezIDs and gene symbols, mixture of human and mouse IDs.
+	- `genes_deMagalhaes_over/under.txt/bed` - gene symbols of 232 overespressed/146 underexpressed with age genes. BED files contain promoters (+2000..-500bp) of these genes, extracted with `R.Aging/genes_promoters_extract.Rmd`
+
 ### `genes/GenAge`
 
 Data from [Human Ageing Genomic Resources](http://genomics.senescence.info/download.html)
@@ -52,7 +52,7 @@ Data from [Human Ageing Genomic Resources](http://genomics.senescence.info/downl
 - `genes_GenAge.bed` - promoters (+2000..-500bp) of these genes, extracted with `R.Aging/genes_promoters_extract.Rmd`
 
 
-### `genes/JenAge
+### `genes/JenAge`
 
 Data from [JenAge/AgeFactDB](http://agefactdb.jenage.de/cgi-bin/jaDB.cgi?VIEW=download). Use 'Ageing Factor Type': 'gene', 'Ageing Relevance Evidence': 'Any', 'File Type': 'TSV'
 

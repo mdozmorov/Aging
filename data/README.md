@@ -79,6 +79,14 @@ Supplementary Data 2A lists tissue-specific genes not/associated with age as 0/1
 - `ncomms9570-s5.xlsx` - Supplementary Data 4: Methylation results: Sobel test for methylation-based mediation of age-expression association
 - `ncomms9570-s6.xlsx` - Supplementary Data 5: Transcriptomic age prediction formulas. 5A: Prediction formula weights for all participating cohorts (based on Leave-One-Out Meta-Analyses). 5B: The average "transcriptomic predictor formula" - the GENERAL predictor - for external cohorts
 
+### `genes/Rangaraju`
+
+[Rangaraju et al., “Mood, Stress and Longevity.”]()
+
+- `mp201665x1.docx` - all supplementary material, [download](http://www.nature.com/mp/journal/vaop/ncurrent/suppinfo/mp201665s1.html?url=/mp/journal/vaop/ncurrent/abs/mp201665a.html)
+
+- `Table_S2.xlsx1 - Table S2. Top candidate genes for mood and stress-modulated longevity:  mood and stress evidence (n=67, CFG (Convergent Functional Genomics score) ≥ 5).
+
 ### `genes/Sood`
 
 Sood et al., [“A Novel Multi-Tissue RNA Diagnostic of Healthy Ageing Relates to Cognitive Health Status.”](http://genomebiology.biomedcentral.com/articles/10.1186/s13059-015-0750-x)

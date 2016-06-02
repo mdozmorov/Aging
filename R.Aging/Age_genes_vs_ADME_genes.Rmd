@@ -56,35 +56,44 @@ Prepare enrichment functions ...
 
 ```{r}
 # Enrichment of genes in an gene_list list
-enrichment <- function(genes = genes, all_genes_on_450K = all_genes_on_450K, gene_list = gene_list[[ "gene_list_1" ]]) {
+enrichment <- function(genes_of_interest = genes_of_interest, all_genes_on_450K = all_genes_on_450K, gene_list = gene_list[[ "gene_list_1" ]]) {
   # Prepare 2x2 contingency table
-  Age.genes <- length(intersect(genes, gene_list))
-  Age.notgenes <- length(genes) - Age.genes
-  notAge.genes <- setdiff(all_genes_on_450K, genes) %>% intersect(., gene_list) %>% length
-  notAge.notgenes <- length(all_genes_on_450K) - notAge.genes - length(genes)
-  matrix.2x2 <- matrix(c(Age.genes, Age.notgenes, notAge.genes, notAge.notgenes), nrow = 2)
+  genes_of_interest.AND.gene_list <- length(intersect(genes_of_interest, gene_list))
+  genes_of_interest.NOT.gene_list <- length(genes_of_interest) - genes_of_interest.AND.gene_list
+  NOT.genes_of_interest.AND.gene_list <- setdiff(all_genes_on_450K, genes_of_interest) %>% intersect(., gene_list) %>% length
+  NOT.genes_of_interest.NOT.gene_list <- length(all_genes_on_450K) - NOT.genes_of_interest.AND.gene_list - length(genes_of_interest)
+  matrix.2x2 <- matrix(c(genes_of_interest.AND.gene_list, genes_of_interest.NOT.gene_list, NOT.genes_of_interest.AND.gene_list, NOT.genes_of_interest.NOT.gene_list), nrow = 2)
   # Precaution against zeros
-  if (Age.genes == 0) {
+  if (genes_of_interest.AND.gene_list == 0) {
     return("Nothing significant")
   }
   return(fisher.test(matrix.2x2))
 }
 
 # Wrapper to print the results
-enrichment.all <- function(genes = genes, all_genes_on_450K = all_genes_on_450K, gene_list = gene_list[[ "gene_list_1" ]], gene_list_name = names(gene_list)[1]) {
-  res <- enrichment(genes, all_genes_on_450K, gene_list = gene_list)
+enrichment.all <- function(genes_of_interest = genes_of_interest, genes_of_interest_name = "", all_genes_on_450K = all_genes_on_450K, gene_list = gene_list[[ "gene_list_1" ]], gene_list_name = names(gene_list)[1]) {
+  res <- enrichment(genes_of_interest, all_genes_on_450K, gene_list = gene_list)
   if (class(res) == "character") {
-    print(paste("Age genes do not contain", gene_list_name, "genes"))
+    # print(paste("Age genes do not contain", gene_list_name, "genes"))
   } else {
-    genes_intersecting_gene_list <- intersect(genes, gene_list)
-    print(paste(length(genes), "Age genes contain", length(genes_intersecting_gene_list), "genes in", 
-                gene_list_name, ifelse(res$estimate > 0, ", enriched", ", depleted"), "at Fisher's exact p-value", formatC(res$p.value, digits = 3, format = "e"), ifelse(res$p.value > 0.05, ", not significant", "") ))
+    genes_intersecting_gene_list <- intersect(genes_of_interest, gene_list)
+    print(paste(length(genes_of_interest), genes_of_interest_name, "genes contain", length(genes_intersecting_gene_list), "genes in", gene_list_name, ifelse(res$estimate > 0, ", enriched", ", depleted"), "at Fisher's exact p-value", formatC(res$p.value, digits = 3, format = "e"), ifelse(res$p.value > 0.05, ", not significant", "") ))
     print(genes_intersecting_gene_list)
     if (any(grepl("CYP", genes_intersecting_gene_list))) {
       print(paste("CYP genes found:", paste(genes_intersecting_gene_list[grepl("CYP", genes_intersecting_gene_list)], collapse = ",") ))
     }
   }
 }
+```
+
+### `Pair-wise enrichment of lists of genes of interest`
+
+```{r}
+pair_wise_combinations <- combn(names(gene_list), m = 2)
+
+apply(pair_wise_combinations, 2, function(x) {
+  results <- enrichment.all(gene_list[[ x[1] ]], x[1], all_genes_on_450K, gene_list[[ x[2] ]], x[2])
+})
 ```
 
 
@@ -94,8 +103,9 @@ Alisch R. et. al. ["Age-associated DNA methylation in pediatric populations"](ht
 
 ```{r}
 genes <- readLines("../data/Alisch/genes.txt")
+genes_name <- "Alisch"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -129,8 +139,9 @@ Florath et al., [“Cross-Sectional and Longitudinal Changes in DNA Methylation 
 
 ```{r}
 genes <- readLines("../data/Florath/genes.txt")
+genes_name <- "Florath"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -140,8 +151,9 @@ De Magalhães, J. P., et.al. ["Meta-analysis of age-related gene expression prof
 
 ```{r}
 genes <- readLines("../data/genes/deMagalhaes/genes.txt")
+genes_name <- "deMagalhaes"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -151,8 +163,9 @@ Data from [Human Ageing Genomic Resources](http://genomics.senescence.info/downl
 
 ```{r}
 genes <- readLines("../data/genes/GenAge/genes.txt")
+genes_name <- "GenAge"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -162,8 +175,9 @@ Data from [JenAge/AgeFactDB](http://agefactdb.jenage.de/cgi-bin/jaDB.cgi?VIEW=do
 
 ```{r}
 genes <- readLines("../data/genes/JenAge/genes.txt")
+genes_name <- "JenAge"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -173,8 +187,9 @@ Data from [Human Ageing Genomic Resources](http://genomics.senescence.info/downl
 
 ```{r}
 genes <- readLines("../data/genes/LongevityMap/genes.txt")
+genes_name <- "LongevityMap"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -186,8 +201,9 @@ Peters MJ, et. al. ["The transcriptional landscape of age in human peripheral bl
 
 ```{r}
 genes <- readLines("../data/genes/Peters/genes_blood.txt")
+genes_name <- "Peters, blood"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -195,8 +211,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/genes/Peters/genes_CD4+.txt")
+genes_name <- "Peters, CD4+"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -204,8 +221,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/genes/Peters/genes_CD8+.txt")
+genes_name <- "Peters, CD8+"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -213,8 +231,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/genes/Peters/genes_monocytes.txt")
+genes_name <- "Peters, Monocytes"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -222,8 +241,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/genes/Peters/genes_lymphocytes.txt")
+genes_name <- "Peters, Lymphocytes"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -231,8 +251,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/genes/Peters/genes_LCLs.txt")
+genes_name <- "Peters, LCLs"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -240,8 +261,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/genes/Peters/genes_cerebellum.txt")
+genes_name <- "Peters, Cerebellum"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -249,8 +271,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/genes/Peters/genes_frontalcortex.txt")
+genes_name <- "Peters, Frontal Cortex"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -260,8 +283,9 @@ Sood et al., [“A Novel Multi-Tissue RNA Diagnostic of Healthy Ageing Relates t
 
 ```{r}
 genes <- readLines("../data/genes/Sood/genes.txt")
+genes_name <- "Sood"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -273,8 +297,9 @@ Hannum G. et. al. ["Genome-wide methylation profiles reveal quantitative views o
 
 ```{r}
 genes <- readLines("../data/Hannum/genes_all.txt")
+genes_name <- "Hannum, all"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -282,8 +307,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/Hannum/genes_primary.txt")
+genes_name <- "Hannum, primary"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -291,8 +317,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/Hannum/genes_associated.txt")
+genes_name <- "Hannum, associated"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -300,8 +327,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/Hannum/genes_breast.txt")
+genes_name <- "Hannum, breast"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -309,8 +337,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/Hannum/genes_kidney.txt")
+genes_name <- "Hannum, kidney"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -318,8 +347,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/Hannum/genes_lung.txt")
+genes_name <- "Hannum, lung"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -329,8 +359,9 @@ Heyn, H., et.al. ["Distinct DNA methylomes of newborns and centenarians"](http:/
 
 ```{r}
 genes <- readLines("../data/Heyn/genes.txt")
+genes_name <- "Heyn"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -340,8 +371,9 @@ Horvath S: "[DNA methylation age of human tissues and cell types](http://genomeb
 
 ```{r}
 genes <- readLines("../data/Horvath/genes.txt")
+genes_name <- "Horvath"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -351,8 +383,9 @@ Marttila S, et.al. "[Ageing-associated changes in the human DNA methylome: genom
 
 ```{r}
 genes <- readLines("../data/Marttila/genes.txt")
+genes_name <- "Marttila"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -362,8 +395,9 @@ Rakyan V. et. al. ["Human aging-associated DNA hypermethylation occurs preferent
 
 ```{r}
 genes <- readLines("../data/Rakyan/genes.txt")
+genes_name <- "Rakyan"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -375,8 +409,9 @@ Reynolds, L. M. et. al. ["Age-related variations in the methylome associated wit
 
 ```{r}
 genes <- readLines("../data/Reynolds/genes_CD4+.txt")
+genes_name <- "Reynolds, CD4+"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -384,8 +419,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/Reynolds/genes_monocytes.txt")
+genes_name <- "Reynolds, Monocytes"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -397,8 +433,9 @@ Steegenga, W. T., et. al. ["Genome-wide age-related changes in DNA methylation a
 
 ```{r}
 genes <- readLines("../data/Steegenga/genes_and_DMR.txt")
+genes_name <- "Steegenga, genes and methylation"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -406,8 +443,9 @@ for (name in names(gene_list)) {
 
 ```{r}
 genes <- readLines("../data/Steegenga/genes_not_DMR.txt")
+genes_name <- "Steegenga, genes not methylation"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 
@@ -417,8 +455,9 @@ Weidner et al., [“Aging of Blood Can Be Tracked by DNA Methylation Changes at 
 
 ```{r}
 genes <- readLines("../data/Weidner/genes.txt")
+genes_name <- "Weidner"
 for (name in names(gene_list)) {
-  enrichment.all(genes, all_genes_on_450K, gene_list[[name]], name)
+  enrichment.all(genes, genes_name, all_genes_on_450K, gene_list[[name]], name)
 }
 ```
 

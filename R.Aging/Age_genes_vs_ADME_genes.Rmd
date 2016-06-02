@@ -33,12 +33,22 @@ Prepare gene lists ...
 - `gene_list_1` - ADME core genes
 - `gene_list_2` - ADME extended genes
 - `gene_list_3` - ADME related genes
+- `gene_list_4` - Coagulation
+- `gene_list_5` - Heparan Sulfate Biosynthesis
+- `gene_list_6` - N-Linked Glycosylation
+- `gene_list_7` - O-Linked Glycosylation
+- `gene_list_8` - Glycosylation
 
 ```{r}
 gene_list <- list(
   gene_list_1 = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_core.txt"),
   gene_list_2 = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_extended.txt"),
-  gene_list_3 = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_related.txt")
+  gene_list_3 = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_related.txt"),
+  gene_list_4 = as.character(unlist(openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 1))),
+  gene_list_5 = as.character(unlist(openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 2))),
+  gene_list_6 = as.character(unlist(openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 3))),
+  gene_list_7 = as.character(unlist(openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 4))),
+  gene_list_8 = as.character(unlist(openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 5)))
 )
 ```
 

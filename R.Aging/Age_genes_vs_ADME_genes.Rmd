@@ -60,7 +60,12 @@ enrichment.all <- function(genes = genes, genes.cg = genes.cg, ADME = ADME.core)
   if (class(res) == "character") {
     print(paste("Age genes do not contain", deparse(substitute(ADME)), "genes"))
   } else {
-    print(paste(length(genes), "Age genes contain", length(intersect(genes, ADME)), deparse(substitute(ADME)), ifelse(res$estimate > 0, "enriched", "depleted"), "at Fisher's exact p-value", formatC(res$p.value, digits = 3, format = "e"), ifelse(res$p.value > 0.05, "not significant", "") ))
+    genes_intersecting_ADME <- intersect(genes, ADME)
+    print(paste(length(genes), "Age genes contain", length(genes_intersecting_ADME), deparse(substitute(ADME)), ifelse(res$estimate > 0, "enriched", "depleted"), "at Fisher's exact p-value", formatC(res$p.value, digits = 3, format = "e"), ifelse(res$p.value > 0.05, "not significant", "") ))
+    print(genes_intersecting_ADME)
+    if (any(grepl("CYP", genes_intersecting_ADME))) {
+      print(paste("CYP genes found:", paste(genes_intersecting_ADME[grepl("CYP", genes_intersecting_ADME)], collapse = ",") ))
+    }
   }
 }
 ```

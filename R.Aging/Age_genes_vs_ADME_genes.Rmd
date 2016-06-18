@@ -19,7 +19,7 @@ library(dplyr)
 
 Prepare list of all genes ...
 
-```{r}
+```{r cache = TRUE}
 # Read in 450K annotation
 ANNOT <- "/Users/mikhail/Documents/Work/GenomeRunner/Aging/Illumina/GPL13534-11288.txt.gz"
 annot.cg <- read.table("/Users/mikhail/Documents/Work/GenomeRunner/Aging/Illumina/GPL13534-11288.txt.gz", sep = "\t", skip=37, header=T, stringsAsFactors = FALSE, fill = T)
@@ -41,16 +41,31 @@ Prepare gene lists ...
 
 ```{r}
 gene_list <- list(
-  gene_list_1 = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_core.txt"),
-  gene_list_2 = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_extended.txt"),
-  gene_list_3 = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_related.txt"),
-  gene_list_4 = as.character(unlist(openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 1))),
-  gene_list_5 = as.character(unlist(openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 2))),
-  gene_list_6 = as.character(unlist(openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 3))),
-  gene_list_7 = as.character(unlist(openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 4))),
-  gene_list_8 = as.character(unlist(openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 5)))
+  ADME_core = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_core.txt"),
+  ADME_extended = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_extended.txt"),
+  ADME_related = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_related.txt"),
+  Coagulation = openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 1) %>% unlist %>% as.character() %>% gsub(" ", "", .),
+  Heparan_Sulfate_Biosynthesis = openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 2) %>% unlist %>% as.character() %>% gsub(" ", "", .),
+  N_linked_Glycosylation = openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 3) %>% unlist %>% as.character() %>% gsub(" ", "", .),
+  O_linked_Glycosylation = openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 4) %>% unlist %>% as.character() %>% gsub(" ", "", .),
+  Glycosylation = openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 5) %>% unlist %>% as.character() %>% gsub(" ", "", .)
 )
 ```
+
+Optionally, Extract promters
+
+```{r eval = FALSE}
+library(MDmisc)
+# Wrapper to save promoter files
+get_promoters <- function(selected, fileName) {
+  gr_promoter_extract(selected = selected, id = "symbol", upstream = 2000, downstream = 500)$promoters %>% write.table(., file = paste0("../data/BED.promoters/ADME/", fileName, ".bed"), sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
+}
+# Apply it to all gene lists
+for (i in 1:length(gene_list)) {
+  get_promoters(selected = gene_list[[i]], fileName = names(gene_list)[i])
+}
+```
+
 
 Prepare enrichment functions ...
 

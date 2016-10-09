@@ -77,7 +77,7 @@ wilcox.pval <- vector(mode = "numeric", length = nrow(mtx))
 # Testing each row
 for (i in 1:nrow(mtx)) {
   print(i)
-  M.upper <- beta2m(combat_edata[ mtx$X[i], annot$Age < Age.q["75%"] & !is.na(combat_edata[ mtx$X[i], ]) ])
+  M.upper <- beta2m(combat_edata[ mtx$X[i], annot$Age > Age.q["75%"] & !is.na(combat_edata[ mtx$X[i], ]) ])
   M.lower <- beta2m(combat_edata[ mtx$X[i], annot$Age < Age.q["25%"] & !is.na(combat_edata[ mtx$X[i], ]) ])
   b2M.diff[i] <- mean(M.upper) - mean(M.lower) # Get difference
   wilcox.pval[i] <- wilcox.test(M.upper, M.lower)$p.value # Get p-value
@@ -99,11 +99,11 @@ b2M.diff.sig <- b2M.diff.sig[ order(b2M.diff.sig$wilcox.pval), ]
 # We annotate CpG probes by "non-specific", "polymorphic", "SNP" status - these are uncertain probes. We remove non-specific probes.
 # Filtering
 # Exclude non-specific probes
-annot.nonspecific <- openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/Aging/Illumina/48639-non-specific-probes-Illumina450k.xlsx", sheet = 1, cols = 1)
+annot.nonspecific <- openxlsx::read.xlsx("/Users/mdozmorov/Documents/Work/GenomeRunner/Aging/Illumina/48639-non-specific-probes-Illumina450k.xlsx", sheet = 1, cols = 1)
 ind <- which(is.element(mtx$X, annot.nonspecific$TargetID))
 mtx <- mtx[ -ind, ]
 # Exclude polymorphic probes
-annot.polymorphic <- openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/Aging/Illumina/48640-polymorphic-CpGs-Illumina450k.xlsx", sheet = 1, cols = 1)
+annot.polymorphic <- openxlsx::read.xlsx("/Users/mdozmorov/Documents/Work/GenomeRunner/Aging/Illumina/48640-polymorphic-CpGs-Illumina450k.xlsx", sheet = 1, cols = 1)
 ind <- which(is.element(mtx$X, annot.polymorphic$PROBE))
 mtx <- mtx[ -ind, ]
 
@@ -145,8 +145,8 @@ We attach selected probe annotations provided by Illumina. The results are in
 
 ```{r}
 # Read in 450K annotation
-ANNOT <- "/Users/mikhail/Documents/Work/GenomeRunner/Aging/Illumina/GPL13534-11288.txt.gz"
-annot.cg <- read.table("/Users/mikhail/Documents/Work/GenomeRunner/Aging/Illumina/GPL13534-11288.txt.gz", sep = "\t", skip=37, header=T, stringsAsFactors = FALSE, fill = T)
+ANNOT <- "/Users/mdozmorov/Documents/Work/GenomeRunner/Aging/Illumina/GPL13534-11288.txt.gz"
+annot.cg <- read.table("/Users/mdozmorov/Documents/Work/GenomeRunner/Aging/Illumina/GPL13534-11288.txt.gz", sep = "\t", skip=37, header=T, stringsAsFactors = FALSE, fill = T)
 # Gene annotations
 grch38.slim <- grch38[, c("symbol", "description")]
 grch38.slim <- unique(grch38.slim) # Get rid of duplicated rows
@@ -183,7 +183,7 @@ b2M.diff.sig$UCSC_RefGene_Group <- sapply(b2M.diff.sig$UCSC_RefGene_Group, funct
 # Attach gene name description
 UCSC_RefGene_Description <- vector(mode = "character", length = length(b2M.diff.sig$UCSC_RefGene_Name))
 for (i in 1:length(b2M.diff.sig$UCSC_RefGene_Name)) {
-  if (!is.na(b2M.diff.sig$UCSC_RefGene_Name[i] & b2M.diff.sig$UCSC_RefGene_Name != "")) { # Proceed if something is present
+  if (!is.na(b2M.diff.sig$UCSC_RefGene_Name[i]) & b2M.diff.sig$UCSC_RefGene_Name != "") { # Proceed if something is present
     a = b2M.diff.sig$UCSC_RefGene_Name[i] # Gene(s) of interest
     b = strsplit(a, "|", fixed = TRUE) %>% unlist # Split them, if multiple
     c = left_join(data.frame(gene = b, stringsAsFactors = FALSE), grch38[, c("symbol", "description")], by = c("gene" = "symbol")) # Append description

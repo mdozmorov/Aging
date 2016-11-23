@@ -91,7 +91,7 @@ h <- heatmap.2(mtx.cor, Rowv=hclustergram.ext, Colv=hclustergram.ext, col=col3(2
 # key=F,  symkey=T, keysize=0.1      
 ```
 
-```{r}
+```{r eval = FALSE}
 # Save correlogram
 pdf("Figures/Figure_Meta_regulatory_similarity.pdf", height = 7)
 par(oma=c(7,0,0,7)) # Make right and bottom margins larger
@@ -169,7 +169,7 @@ print(paste("Pos/Neg assignment accounts for", signif(summary(pca.lm)$adj.r.squa
 ```{r eval=TRUE, fig.height=7, fig.width=11}
 scores <- as.data.frame(pca$x, stringsAsFactors = FALSE)
 scores <- mutate(scores, Name = rownames(scores), Category = ifelse(grepl("pos", rownames(scores)), "POS", "NEG"))
-pt <- ggplot(data=scores, aes(x=as.numeric(PC1), y=as.numeric(PC2), label=Name)) +
+pt <- ggplot(data=scores, aes(x=as.numeric(PC1), y=as.numeric(PC2), label=c("Alisch et. al. (2012)", "Alisch et. al. (2012)", "Current study", "Current study", "Heyn et. al. (2012)", "Heyn et. al. (2012)", "Marttila et. al. (2015)", "Marttila et. al. (2015)", "Reynolds et. al. (2014)", "Reynolds et. al. (2014)", "Florath et. al. (2012)", "Florath et. al. (2012)", "Weidner et. al. (2014)", "Weidner et. al. (2014)"  ))) +
   geom_point(aes(color = Category), size = 4) +
   ggtitle("PCA of the regulatory similarities") + 
   labs(x = "PC1 (40.43%)", y = "PC2 (18.75%") +
@@ -180,7 +180,7 @@ pt <- ggplot(data=scores, aes(x=as.numeric(PC1), y=as.numeric(PC2), label=Name))
   geom_text_repel(colour = "black", size = 4) 
 # + scale_x_continuous(limits = c(-60, 60))
 plot(pt)
-# ggsave(filename="Figures/Supplementary Figure 3 - PCA epigenomic similarity.pdf", plot=pt, height = 9)
+ggsave(filename="Figures/Supplementary Figure 3 - PCA epigenomic similarity.pdf", plot=pt, height = 9)
 ```
 
 The figures are saved in the `"Figures/Supplementary Figure 3 - PCA epigenomic similarity.pdf"` file.

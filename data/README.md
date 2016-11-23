@@ -168,6 +168,17 @@ Reynolds, L. M. et. al. ["Age-related variations in the methylome associated wit
 
 - [Supplementary Data 2](http://www.nature.com/ncomms/2014/141118/ncomms6366/extref/ncomms6366-s3.xlsx) - 2,259 regions correlated with age by methylation on CD14+ monocytes. 468 of them showed positive correlation with age by methylation, 1,791 were found to be negatively correlated with age.
 
+### `Slieker`
+
+Slieker, R., et al. [“Age-Related Accrual of Methylomic Variability Is Linked to Fundamental Ageing Mechanisms.”](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1053-6) Genome Biology 2016 - changes in variability of methylation with age
+
+- `13059_2016_1053_MOESM2_ESM.xlsx` - Additional file 2: List of validated aVMPs and their genomic location (hg19). 6366 aVMPs. Not separated into increased/decreased
+
+- `13059_2016_1053_MOESM5_ESM.xlsx`- Additional file 5: Relation between DNA methylation and gene expression in cis. 1988 cis-aVMPs out of the 6366 aVMPs were associated with gene expression of 1549 genes in cis. 
+
+- `13059_2016_1053_MOESM6_ESM.xlsx` - Additional file 6: Identified aVMRs with nearest protein coding gene. 160 aVMRs encompassing 527 aVMPs.
+
+- `13059_2016_1053_MOESM8_ESM.xlsx` - Additional file 8: Relationship between DNA methylation and gene expression in trans. Of the total number of 6366 aVMPs, 1816 were associated with expression of 854 coding genes in trans.
 
 ### `SNPs`
 

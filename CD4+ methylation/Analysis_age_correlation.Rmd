@@ -45,7 +45,7 @@ lmp <- function (modelobject) {
 # MethyFileName <- "/Users/mikhail/Documents/Data/Work_OMRF/Amr/Control Naive CD4+ T cell Methylation/Control Naive CD4 Tcell Methylation Values.csv.gz"
 # mldat <- methylumiR(filename = MethyFileName)
 # save(list = "mldat", file = "data/mldat.rda")
-load("/Users/mikhail/Documents/Data/Work_OMRF/Amr/Control Naive CD4+ T cell Methylation/mldat.rda")
+load("/Users/mdozmorov/Documents/Data/Work_OMRF/Amr/Control Naive CD4+ T cell Methylation/mldat.rda")
 ```
 
 ```{r}
@@ -216,6 +216,39 @@ save(list = c("combat_edata"), file = "data/combat_edata_parpriorTrue.rda")
 cor.raw <- cor(pData(melon.dasen.pf)$Age, t(betas(melon.dasen.pf))) # Correlation with age before any adjustments
 cor.adj <- cor(pData(melon.dasen.pf)$Age, t(combat_edata)) # Correlation with age after batch adjustment
 cor(as.numeric(cor.raw), as.numeric(cor.adj), use = "complete.obs") # How raw and adjusted vectors of correlation coefficients compare?
+```
+
+# PCA after batch removal
+
+```{r}
+# PCA: Check for batch effects. Select one batch, to color points by its assignment
+# batch <- "Race"
+batch <- "BeadChip.ID"
+# batch <- "Chip.Placement"
+pca <- combat_edata[ complete.cases(combat_edata) & apply(combat_edata, 1, sd) != 0, ] %>% scale %>% t %>% prcomp
+data.frame(summary(pca)$importance)[, 1:5] %>% pander # Percent of variance explained
+# What correlates with the first component
+pca.lm <- lm( as.numeric(PC1) ~ factor(BeadChip.ID), data = cbind(annot, pca$x))
+print(paste("BeadChip.ID accounts for", signif(summary(pca.lm)$adj.r.squared, 5), "variability explained by the first principle component, p-value", signif(lmp(pca.lm), 5)))
+pca.lm <- lm( as.numeric(PC1) ~ factor(Chip.Placement), data = cbind(annot, pca$x))
+print(paste("Chip.Placement accounts for", signif(summary(pca.lm)$adj.r.squared, 5), "variability explained by the first principle component, p-value", signif(lmp(pca.lm), 5)))
+pca.lm <- lm( as.numeric(PC1) ~ factor(Race), data = cbind(annot, pca$x))
+print(paste("Race accounts for", signif(summary(pca.lm)$adj.r.squared, 5), "variability explained by the first principle component, p-value", signif(lmp(pca.lm), 5)))
+
+pt <- ggplot(data = data.frame(pca$x, annot, samples = annot$Sample.ID, stringsAsFactors = F), 
+             aes(x = as.numeric(PC1), y = as.numeric(PC2), label = eval(parse(text = batch)))) +
+  theme(plot.title = element_text(lineheight = 0.8, face="bold")) +
+  ggtitle(paste("Batch coloring:", batch)) +
+  geom_point(aes(color = eval(parse(text = batch))), size = 3) +
+  geom_text_repel(colour = "black", size = 3) +
+  geom_hline(yintercept = 0, colour = "gray65") +
+  geom_vline(xintercept = 0, colour = "gray65") +
+  labs(color = batch) +
+  scale_x_continuous(name = "PC1 (12.46%)") +
+  scale_y_continuous(name = "PC2 (4.39%)")
+plot(pt)
+
+ggsave(filename = "Figures/Figure_PCA_nobatch.pdf", plot = pt, height = 8, width = 11)
 ```
 
 # Correlation analysis

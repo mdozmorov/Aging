@@ -33,6 +33,9 @@ Illumina 450K. BED coordinates: 119 up, 43 dn, 162 total.
 
 Table 2 from Florath et al., [“Cross-Sectional and Longitudinal Changes in DNA Methylation with Age.”](http://hmg.oxfordjournals.org/content/23/5/1186.long), 162 differentially methylated CpG sites for age with Bonferroni-corrected statistical significance (P < 2.5 × 10-4)
 
+### `genes`
+
+- `Aging_Perturbations_from_GEO_down.txt`, `Aging_Perturbations_from_GEO_up.txt` - Enrichr data. Downloaded on 12/30/2016.
 
 ### `genes/deMagalhaes`
 
@@ -208,3 +211,23 @@ Supplemental table 4S: 7,477 age-associated methylation markers identified in mu
 Illumina 450K. BED coordinates: 42 up, 57 dn, 99 total.
 
 Additional file 2 from Weidner et al., [“Aging of Blood Can Be Tracked by DNA Methylation Changes at Just Three CpG Sites.”](http://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r24) - Beta values for 102 AR-GpGs from 575 samples
+
+### `Yang-Teschendorff` - mitotic clock 
+
+Yang, Zhen, Andrew Wong, Diana Kuh, Dirk S. Paul, Vardhman K. Rakyan, R. David Leslie, Shijie C. Zheng, Martin Widschwendter, Stephan Beck, and Andrew E. Teschendorff. “Correlation of an Epigenetic Mitotic Clock with Cancer Risk.” Genome Biology 17, no. 1 (October 3, 2016): 205. doi:10.1186/s13059-016-1064-3.
+
+Supplementary material from https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1064-3
+
+- `13059_2016_1064_MOESM1_ESM.xls` - Table S1: The blood reference DNAm database. DNAm beta-values for 333 CpGs in 7 blood cell subtypes, as indicated. These CpGs discriminate at least one cell-type from all others (FDR < 0.05), using Illumina 450k data from Reinius et al and maps to a DHS in a blood cell subtype, with DHS data taken from the NIH Epigenomics Roadmap. For each of the 7 blood cell subtypes, the top 50 discriminatory CpGs with FDR < 0.05 were selected, ranked by difference in mean DNAm in order to select features with large differences in DNAm between the blood cell subtypes. This resulted in 333 unique CpGs.
+
+- `13059_2016_1064_MOESM2_ESM.xls` - Table S2: The CpGs making up the pcgtAge model. Excel format table lists CpG id, t-statistic, P-value and FDR-value of all 385 age-hypermethylated PRC2 marked promoter CpGs (FDR<0.05), which are constitutively unmethylated in 52 fetal tissue samples from the Stem Cell Matrix Compendium-2 data, including cord blood data from GSE72867. Other columns give the average DNAm beta-value across all whole blood samples from Hannum et al, as well as the DNAm beta-value in all 52 fetal samples. All beta-values have been rounded to 2 significant digits, so beta-values <0.01 have been rounded to zero.
+
+- `13059_2016_1064_MOESM5_ESM.rdata` - epiTOCcpgs.RData. An R object data file containing the 450 k probe IDs of the 385 PCGT CpGs that make up epiTOC. (RDATA 1 kb)
+
+- `13059_2016_1064_MOESM6_ESM.r` - EstEpiTOC.R. An executable R script function to allow estimation of the pcgtAge score in independent samples. (R 1 kb)
+
+
+
+
+
+

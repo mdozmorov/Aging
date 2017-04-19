@@ -1,7 +1,13 @@
-Extract genomic coordinates of CpG probes on Illumina 450K and Illumina 27K arrays.
+Extract genomic coordinates of CpG probes on Illumina 850K, 450K and Illumina 27K arrays.
 ===
 
-Prerequisites: Use "Download full table..." button to get full annotation table in text format for
+## 850K
+
+- `Illumina850K.R` generates annotation file and a hg19 BED file
+
+## 450K, 27K
+
+Use "Download full table..." button to get full annotation table in text format for
 
 - Illumina 450K: [http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GPL13534](http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GPL13534)
 

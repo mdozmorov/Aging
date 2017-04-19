@@ -17,15 +17,22 @@ tidy.opts=list(width.cutoff=200)
 suppressMessages(library(pander))
 panderOptions('table.split.table', Inf)
 set.seed(1)
+```
+
+```{r libraries, message=FALSE}
 library(dplyr)
+library(MDmisc)
+library(org.Hs.eg.db)
+library(msigdf)
+library(stargazer)
 ```
 
 Prepare list of all genes ...
 
 ```{r cache = TRUE}
 # Read in 450K annotation
-ANNOT <- "/Users/mikhail/Documents/Work/GenomeRunner/Aging/Illumina/GPL13534-11288.txt.gz"
-annot.cg <- read.table("/Users/mikhail/Documents/Work/GenomeRunner/Aging/Illumina/GPL13534-11288.txt.gz", sep = "\t", skip=37, header=T, stringsAsFactors = FALSE, fill = T)
+ANNOT <- "/Users/mdozmorov/Documents/Work/GenomeRunner/Aging/Illumina/GPL13534-11288.txt.gz"
+annot.cg <- read.table("/Users/mdozmorov/Documents/Work/GenomeRunner/Aging/Illumina/GPL13534-11288.txt.gz", sep = "\t", skip=37, header=T, stringsAsFactors = FALSE, fill = T)
 # Select genes only
 all_genes <- annot.cg$UCSC_RefGene_Name[ annot.cg$UCSC_RefGene_Name != "" ]
 all_genes <- sapply(all_genes, function(x) strsplit(x, ";")) %>% unlist %>% sort %>% unique %>% as.character
@@ -44,9 +51,9 @@ Prepare lists of genes of interest...
 
 ```{r}
 gene_list <- list(
-  ADME_core = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_core.txt"),
-  ADME_extended = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_extended.txt"),
-  ADME_related = readLines("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_related.txt") #,
+  ADME_core = readLines("/Users/mdozmorov/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_core.txt"),
+  ADME_extended = readLines("/Users/mdozmorov/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_extended.txt"),
+  ADME_related = readLines("/Users/mdozmorov/Documents/Work/GenomeRunner/gwas2bed/genes/data/ADME_related.txt") #,
 #   Coagulation = openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 1) %>% unlist %>% as.character() %>% gsub(" ", "", .),
 #   Heparan_Sulfate_Biosynthesis = openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 2) %>% unlist %>% as.character() %>% gsub(" ", "", .),
 #   N_linked_Glycosylation = openxlsx::read.xlsx("/Users/mikhail/Documents/Work/GenomeRunner/gwas2bed/genes/data/Genes_Glycosylation and Coagulation Genes.xlsx", sheet = 1, startRow = 4, colNames = FALSE, cols = 3) %>% unlist %>% as.character() %>% gsub(" ", "", .),
@@ -143,7 +150,11 @@ for (name in names(gene_list)) {
  gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
  enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+# stargazer(res, summary = FALSE, type = "html", rownames = FALSE)
+pander(res)
 ```
+
 
 ### `Fernandez`
 
@@ -193,6 +204,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ## `genes/GenAge`
@@ -206,6 +219,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ### `genes/JenAge`
@@ -219,6 +234,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ### `genes/LongevityMap`
@@ -232,6 +249,8 @@ for (name in names(gene_list)) {
  gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ### `genes/Peters`
@@ -247,6 +266,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **CD4+**
@@ -258,6 +279,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **CD8+**
@@ -269,6 +292,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **Monocytes**
@@ -280,6 +305,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **Lymphocytes**
@@ -291,6 +318,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **LCLs**
@@ -302,6 +331,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **Cerebellum**
@@ -313,6 +344,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **Frontal Cortex**
@@ -324,6 +357,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ### `genes/Sood`
@@ -337,6 +372,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ### `Hannum`
@@ -352,6 +389,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **Primary - The 71 age-associated methylation regions included in the primary aging model**
@@ -363,6 +402,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **Associated**
@@ -374,6 +415,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **Breast**
@@ -385,6 +428,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **Kidney**
@@ -396,6 +441,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **Lung**
@@ -407,6 +454,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ### `Heyn`
@@ -420,6 +469,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ### `Horvath`
@@ -433,6 +484,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ### `Marttila`
@@ -446,6 +499,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ### `Rakyan`
@@ -459,6 +514,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ### `Reynolds`
@@ -474,6 +531,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **Monocytes**
@@ -485,6 +544,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ### `Steegenga`
@@ -500,6 +561,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 **Genes, not methylation, changes**
@@ -511,6 +574,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 ### `Weidner`
@@ -524,6 +589,8 @@ for (name in names(gene_list)) {
   gene_annotations[[name]] <- c(gene_annotations[[name]], list(annotate_genes(genes = genes, genes_name = genes_name, name = name,  gene_list = gene_list)))
   enrichment.all(genes, genes_name, all_genes, gene_list[[name]], name)
 }
+res <- gene_enrichment(selected = genes, all.universe = all_genes, id = "symbol", use = "custom", ont = "pharmacology", pval = 1, p.adj = 1)
+pander(res)
 ```
 
 # Save annotation results

@@ -21,4 +21,5 @@ Scripts and data files for the epigenomic enrichment analysis of age-associated 
 
 ## Papers
 
+- Horvath, Steve, and Kenneth Raj. “DNA Methylation-Based Biomarkers and the Epigenetic Clock Theory of Ageing.” Nature Reviews Genetics, April 11, 2018. https://doi.org/10.1038/s41576-018-0004-3. - Epigenetic clock review. Horvath clock, Hannum, PhenoAge, other developments. Age-related conditions linked to epigenetic age. Epigenetic age is 40% heritable.
 

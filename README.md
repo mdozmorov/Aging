@@ -8,6 +8,7 @@ This README also collects papers and notes about DNA methylation and aging, aka 
 
 * [Files and folders description](#Files-and-folders-description)
 * [Papers](#Papers)
+  * [Reviews](#Reviews)
 
 ## Files and folders description
 
@@ -22,6 +23,10 @@ This README also collects papers and notes about DNA methylation and aging, aka 
 	- `genes_promoters_extract.Rmd` - extract promoters (+2000..-500bp arount TSS) of age-associated _genes_ (`data` folder).
 
 ## Papers
+
+- Weidner, Carola Ingrid, Qiong Lin, Carmen Maike Koch, Lewin Eisele, Fabian Beier, Patrick Ziegler, Dirk Olaf Bauerschlag, et al. “Aging of Blood Can Be Tracked by DNA Methylation Changes at Just Three CpG Sites.” Genome Biology 15, no. 2 (2014): R24. https://doi.org/10.1186/gb-2014-15-2-r24. - 3-CpG-age predictive model, selected from 102 CpGs. Pearson correlation, then LM, formula. Hypermethylated are enriched in CGIs, bivalent histone modifications. Non-tissue specific (refs to tissue specific). Sex influences age. Epigenomic enrichment using Fisher's exact. Intro about CpG-age epigenomic enrichments. Prediction studies.
+
+### Reviews
 
 - Horvath, Steve, and Kenneth Raj. “DNA Methylation-Based Biomarkers and the Epigenetic Clock Theory of Ageing.” Nature Reviews Genetics, April 11, 2018. https://doi.org/10.1038/s41576-018-0004-3. - Epigenetic clock review. Horvath clock, Hannum, PhenoAge, other developments. Age-related conditions linked to epigenetic age. Epigenetic age is 40% heritable.
 

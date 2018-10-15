@@ -1,13 +1,15 @@
 # Analysis of age-associated genomic regions
 
-Table of content
+Scripts and data files for the epigenomic enrichment analysis of age-associated differentially methylated regions, and genes changing their expression with age. The results are published in Dozmorov, Mikhail G. “Polycomb Repressive Complex 2 Epigenomic Signature Defines Age-Associated Hypermethylation and Gene Expression Changes.” Epigenetics 10, no. 6 (2015): 484–95. https://doi.org/10.1080/15592294.2015.1040619.
+
+This README also collects papers and notes about DNA methylation and aging, aka epigenetic clock.
+
+# Table of content
 
 * [Files and folders description](#Files-and-folders-description)
 * [Papers](#Papers)
 
 ## Files and folders description
-
-Scripts and data files for the epigenomic enrichment analysis of age-associated differentially methylated regions, and genes changing their expression with age.
 
 - `data` - scripts to extract genomic coordinates of the age-associated genomic regions. The description of this folder contains the list of studies and the data available from them.
 

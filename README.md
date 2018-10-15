@@ -8,6 +8,8 @@ This README also collects papers and notes about DNA methylation and aging, aka 
 
 * [Files and folders description](#Files-and-folders-description)
 * [Papers](#Papers)
+  * [Human epigenetic clock](#Human-epigenetic-clock)
+  * [Mouse epigenetic clock](#Mouse-epigenetic-clock)
   * [Reviews](#Reviews)
 
 ## Files and folders description
@@ -24,7 +26,14 @@ This README also collects papers and notes about DNA methylation and aging, aka 
 
 ## Papers
 
+### Human epigenetic clock
+
 - Weidner, Carola Ingrid, Qiong Lin, Carmen Maike Koch, Lewin Eisele, Fabian Beier, Patrick Ziegler, Dirk Olaf Bauerschlag, et al. “Aging of Blood Can Be Tracked by DNA Methylation Changes at Just Three CpG Sites.” Genome Biology 15, no. 2 (2014): R24. https://doi.org/10.1186/gb-2014-15-2-r24. - 3-CpG-age predictive model, selected from 102 CpGs. Pearson correlation, then LM, formula. Hypermethylated are enriched in CGIs, bivalent histone modifications. Non-tissue specific (refs to tissue specific). Sex influences age. Epigenomic enrichment using Fisher's exact. Intro about CpG-age epigenomic enrichments. Prediction studies.
+
+### Mouse epigenetic clock
+
+- BI Ageing Clock Team, Thomas M. Stubbs, Marc Jan Bonder, Anne-Katrien Stark, Felix Krueger, Ferdinand von Meyenn, Oliver Stegle, and Wolf Reik. “Multi-Tissue DNA Methylation Age Predictor in Mouse.” Genome Biology 18, no. 1 (December 2017). https://doi.org/10.1186/s13059-017-1203-5. - Mouse epigenetic age clock, 329 CpGs. Elastic net regression. https://github.com/EpigenomeClock/MouseEpigeneticClock
+
 
 ### Reviews
 

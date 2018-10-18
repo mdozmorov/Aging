@@ -6,23 +6,13 @@ This README also collects papers and notes about DNA methylation and aging, aka 
 
 # Table of content
 
-* [Files and folders description](#Files-and-folders-description)
 * [Papers](#Papers)
   * [Human epigenetic clock](#Human-epigenetic-clock)
   * [Mouse epigenetic clock](#Mouse-epigenetic-clock)
   * [Reviews](#Reviews)
-
-## Files and folders description
-
-- `data` - scripts to extract genomic coordinates of the age-associated genomic regions. The description of this folder contains the list of studies and the data available from them.
-
-- `Illumina` - scripts to extract genomic coordinates of all CpG probes from Illumina Infinium 27K and Illumina Infinium 450K
-
-- `GenomeRunner` - the results of the epigenomic enrichment analysis, and the scripts to process them
-
-- `R.Aging` - R scripts for visualization of the results.
-
-	- `genes_promoters_extract.Rmd` - extract promoters (+2000..-500bp arount TSS) of age-associated _genes_ (`data` folder).
+* [Files and folders description](#Files-and-folders-description)
+  * [data](#data)
+    * [Mouse](#mouse)
 
 ## Papers
 
@@ -40,4 +30,25 @@ This README also collects papers and notes about DNA methylation and aging, aka 
 - Horvath, Steve, and Kenneth Raj. “DNA Methylation-Based Biomarkers and the Epigenetic Clock Theory of Ageing.” Nature Reviews Genetics, April 11, 2018. https://doi.org/10.1038/s41576-018-0004-3. - Epigenetic clock review. Horvath clock, Hannum, PhenoAge, other developments. Age-related conditions linked to epigenetic age. Epigenetic age is 40% heritable.
 
 - Field, Adam E., Neil A. Robertson, Tina Wang, Aaron Havas, Trey Ideker, and Peter D. Adams. “DNA Methylation Clocks in Aging: Categories, Causes, and Consequences.” Molecular Cell 71, no. 6 (September 2018): 882–95. https://doi.org/10.1016/j.molcel.2018.08.008. - Review of DNA methylation age clocks. The dynamic nature of DNA methylation. References to methylation clock studies in humans, mice, other organisms. Clocks derived from multiple tissue data. Poor overlap among studies. Latest specialized clocks like EpiTOC, PhenoAge,  Box 1 - penalized regression framework for epigenetic clock.
+
+
+## Files and folders description
+
+### data
+
+Scripts to extract genomic coordinates of the age-associated genomic regions. The description of this folder contains the list of studies and the data available from them.
+
+#### Mouse
+
+- `Wang_2017.xlsx` - Mouse epigenetic clock, CpG sites and genes. From Wang, Tina, Brian Tsui, Jason F. Kreisberg, Neil A. Robertson, Andrew M. Gross, Michael Ku Yu, Hannah Carter, Holly M. Brown-Borg, Peter D. Adams, and Trey Ideker. “Epigenetic Aging Signatures in Mice Livers Are Slowed by Dwarfism, Calorie Restriction and Rapamycin Treatment.” Genome Biology 18, no. 1 (28 2017): 57. https://doi.org/10.1186/s13059-017-1186-2. [Source: Additional file 3](https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-017-1186-2/MediaObjects/13059_2017_1186_MOESM3_ESM.xlsx)
+
+
+
+- `Illumina` - scripts to extract genomic coordinates of all CpG probes from Illumina Infinium 27K and Illumina Infinium 450K
+
+- `GenomeRunner` - the results of the epigenomic enrichment analysis, and the scripts to process them
+
+- `R.Aging` - R scripts for visualization of the results.
+
+	- `genes_promoters_extract.Rmd` - extract promoters (+2000..-500bp arount TSS) of age-associated _genes_ (`data` folder).
 
